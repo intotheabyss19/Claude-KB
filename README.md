@@ -1,6 +1,6 @@
 # Claude Code Knowledge Base
 
-A personal, compounding knowledge base for [Claude Code](https://docs.claude.com/en/docs/claude-code). Hard-won lessons, reusable patterns, custom skills, and output styles — loaded automatically into every Claude Code session via selective symlinks.
+A personal, compounding knowledge base for [Claude Code](https://docs.claude.com/en/docs/claude-code). Hard-won lessons, reusable patterns, and custom skills — loaded automatically into every Claude Code session via selective symlinks.
 
 ## Why This Exists
 
@@ -15,10 +15,11 @@ Every time a non-obvious problem gets solved after real struggle, a lesson gets 
     ├── compress/          → symlink
     ├── commit-messages/   → symlink
     ├── code-review/       → symlink
+    ├── project/           → symlink
     └── review-knowledge-base/ → symlink
 ```
 
-**CLAUDE.md** is the entry point. It uses `@path/to/file` imports to pull in docs, rules, and the output style — keeping itself lean while giving Claude access to everything.
+**CLAUDE.md** is the entry point. It uses `@path/to/file` imports to pull in docs and rules — keeping itself lean while giving Claude access to everything.
 
 **skills/** are individually symlinked so they show up as slash commands (`/compress`, `/commit-messages`, etc.) in every project.
 
@@ -31,14 +32,11 @@ Claude/
 ├── CLAUDE.md                          # Entry point (@imports everything below)
 │
 ├── docs/                              # Reference docs imported by CLAUDE.md
-│   ├── working-rules.md              # Behavioral rules (Karpathy's 4 principles, adapted)
+│   ├── working-rules.md              # Behavioral rules + caveman output style
 │   ├── repo-overview.md              # Repo structure and distribution model
 │   ├── skill-routing.md              # How skills and knowledge get matched to tasks
 │   ├── knowledge-architecture.md     # How lessons are stored, structured, and found
-│   └── project-lifecycle.md          # /project command design (pending)
-│
-├── output-styles/                     # User-facing output style definitions
-│   └── caveman.md                    # Terse/compressed output (always-on)
+│   └── project-lifecycle.md          # /project command — local lesson capture + promotion
 │
 ├── skills/                            # Custom skills (symlinked to ~/.claude/skills/)
 │   ├── compress/                     # Regex-based prose compression
@@ -49,6 +47,8 @@ Claude/
 │   │   └── SKILL.md
 │   ├── code-review/                  # Terse one-line-per-finding reviews
 │   │   └── SKILL.md
+│   ├── project/                      # Project-local lesson capture + promotion
+│   │   └── SKILL.md
 │   └── review-knowledge-base/        # Monthly KB health check (manual-only)
 │       └── SKILL.md
 │
@@ -58,16 +58,17 @@ Claude/
 │   └── memory-consolidation.md       # Episodic → semantic knowledge extraction
 │
 └── knowledge/                         # Task-specific lessons learned (frequent writes)
-    └── README.md                     # Placeholder — lessons accumulate here over time
+    ├── INDEX.md                      # Keyword map — Claude finds lessons via this
+    └── README.md                     # Folder purpose and guidelines
 ```
 
 ## Features
 
-### Caveman Output Style
+### Caveman Output Style (Always-On)
 
-Always-on terse mode for chat replies. Drops articles, filler, pleasantries, and hedging to save tokens and keep context windows useful longer.
+Built into `docs/working-rules.md`. Drops articles, filler, pleasantries, and hedging from all output to save tokens.
 
-**Auto-clarity exceptions** — these always get full, proper English regardless of terse mode:
+**Auto-clarity exceptions** — full proper English regardless of terse mode:
 - Code generation, diffs, and file writes
 - Commit messages and PR descriptions
 - Security warnings
@@ -84,7 +85,8 @@ Say "talk normally" to temporarily disable. "Go terse" to re-enable.
 | **compress** | `/compress`, "compress this file" | Deterministic regex-based prose compression. ~40% token reduction. No LLM calls, no network. Pure computation. |
 | **commit-messages** | `/commit-messages`, generating commits | Conventional commit format. Imperative mood, ≤72 chars, why-over-what. |
 | **code-review** | `/code-review`, "review this PR" | One line per finding: `L<line>: <severity>: <problem>. <fix>.` Severity emojis, no throat-clearing. |
-| **review-knowledge-base** | `/review-knowledge-base` (manual only) | Reads all knowledge/ and patterns/, flags staleness, contradictions, and consolidation candidates. Never auto-applies changes. |
+| **project** | `/project`, "save this lesson", "that was painful" | Captures project-specific lessons into local `.claude/knowledge/`. Drafts a lesson from the struggle, asks you to approve. Supports promotion to global KB. |
+| **review-knowledge-base** | `/review-knowledge-base` (manual only) | Reads all knowledge/ and patterns/ (plus local `.claude/knowledge/` if present), flags staleness, contradictions, and promotion candidates. Never auto-applies changes. |
 
 ### Working Rules
 
@@ -115,7 +117,22 @@ Lessons are grouped by domain in single files (`knowledge/docker.md`, `knowledge
 - 1000–1500: flag for review
 - \> 1500: split into sub-domain files
 
-CLAUDE.md contains a keyword map that points Claude to the right domain file. Splitting is always user-initiated — Claude flags but never auto-splits.
+`knowledge/INDEX.md` contains a keyword map (@imported by CLAUDE.md) that points Claude to the right domain file. Splitting is always user-initiated — Claude flags but never auto-splits.
+
+### Project-Local Lessons
+
+`/project` captures lessons inside each project at `.claude/knowledge/`. On first run, it asks whether to gitignore or commit the folder.
+
+**How it works:**
+1. After a struggle, invoke `/project` (or Claude suggests it when it sees 2+ failed attempts)
+2. Claude drafts a lesson in structured terse format (context/problem/fix)
+3. You approve, edit, or discard
+
+**Promotion to global KB:**
+- Manual: "promote this to global" — Claude moves the lesson to `knowledge/` in this repo
+- Automatic suggestions: `/review-knowledge-base` scans local lessons and suggests promotions
+
+**Local-only lessons:** Mark with `local-only: true` for project-specific lessons that should never be promoted (e.g., client-specific API quirks). Review skips these.
 
 ### Patterns
 
@@ -143,7 +160,6 @@ Preserves code blocks, inline code, URLs, paths, identifiers, and version number
 |------|-------|-----------|-----|
 | CLAUDE.md | `~/.claude/CLAUDE.md` | Yes | Must be in `~/.claude/` for auto-loading |
 | skills/* | `~/.claude/skills/*` | Yes (individual) | Must be in `~/.claude/skills/` for slash commands |
-| output-styles/ | This repo | No | @imported by CLAUDE.md |
 | docs/ | This repo | No | @imported by CLAUDE.md |
 | knowledge/ | This repo | No | Read via absolute path from CLAUDE.md |
 | patterns/ | This repo | No | Read via absolute path from CLAUDE.md |
@@ -162,6 +178,7 @@ mkdir -p ~/.claude/skills
 ln -s ~/Desktop/Obsidian/Prompts/Claude/skills/compress ~/.claude/skills/compress
 ln -s ~/Desktop/Obsidian/Prompts/Claude/skills/commit-messages ~/.claude/skills/commit-messages
 ln -s ~/Desktop/Obsidian/Prompts/Claude/skills/code-review ~/.claude/skills/code-review
+ln -s ~/Desktop/Obsidian/Prompts/Claude/skills/project ~/.claude/skills/project
 ln -s ~/Desktop/Obsidian/Prompts/Claude/skills/review-knowledge-base ~/.claude/skills/review-knowledge-base
 ```
 

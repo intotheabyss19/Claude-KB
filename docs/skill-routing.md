@@ -16,6 +16,7 @@ Current skills and their triggers:
 - **compress** — prose compression, token reduction, shrink a file
 - **commit-messages** — generating commit messages, conventional commits
 - **code-review** — reviewing diffs, PRs, code review
+- **project** — "save this lesson", "capture this", project-local lesson capture
 - **review-knowledge-base** — "review the knowledge base", monthly health check
 
 ### Description budget
@@ -27,27 +28,17 @@ so body length doesn't affect the budget.
 ## Knowledge & Patterns (keyword hints in CLAUDE.md)
 
 Knowledge-base files (`knowledge/`, `patterns/`) are NOT routed via
-the skill description system. Instead, CLAUDE.md contains a keyword
-map — a short section listing topic keywords that point to relevant
-knowledge files.
+the skill description system. Instead, `knowledge/INDEX.md` contains
+a keyword map — topic keywords pointing to relevant domain files.
+CLAUDE.md @imports INDEX.md, so it's loaded every session.
 
 When Claude sees a keyword match while working on a task:
 1. Read the relevant knowledge/pattern file
 2. **Always mention briefly** that a KB entry was found
 3. Apply the lesson if relevant
 
-This costs zero description budget (CLAUDE.md is loaded separately).
-The keyword map must be updated manually when new knowledge files are
-added.
-
-### Example keyword map (in CLAUDE.md)
-
-```
-## Knowledge Map
-- docker, containers → knowledge/docker.md
-- auth, JWT, sessions → knowledge/auth-patterns.md
-- monorepo, workspaces → knowledge/monorepo.md
-```
+This costs zero description budget (loaded via CLAUDE.md @import).
+Update INDEX.md when adding new domain files or lessons.
 
 ## Modifying the Knowledge Base
 

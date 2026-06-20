@@ -66,7 +66,7 @@ Maintain it when adding lessons (append a line). Format:
 
 ## How Claude Finds Lessons
 
-1. CLAUDE.md contains a keyword map (see `docs/skill-routing.md`)
+1. `knowledge/INDEX.md` contains a keyword map (@imported by CLAUDE.md)
 2. Keyword match → Read the domain file
 3. Scan TOC or headings → find relevant lesson
 4. **Always mention** to user that a KB entry was found

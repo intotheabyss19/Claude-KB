@@ -3,10 +3,6 @@
 Personal knowledge base at `/home/ysh/Desktop/Obsidian/Prompts/Claude/`.
 Lessons, patterns, and skills that compound over time.
 
-## Output Style
-
-@/home/ysh/Desktop/Obsidian/Prompts/Claude/output-styles/caveman.md
-
 ## Rules & Behavior
 
 @/home/ysh/Desktop/Obsidian/Prompts/Claude/docs/working-rules.md
@@ -15,10 +11,9 @@ Lessons, patterns, and skills that compound over time.
 
 @/home/ysh/Desktop/Obsidian/Prompts/Claude/docs/repo-overview.md
 
-## Before Solving a Hard Problem
+## Knowledge Index
 
-Check `knowledge/` for existing lessons — someone may have already
-struggled through this. Check `patterns/` for reusable design approaches.
+@/home/ysh/Desktop/Obsidian/Prompts/Claude/knowledge/INDEX.md
 
 ## Skill Routing
 

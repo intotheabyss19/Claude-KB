@@ -44,7 +44,15 @@ Identify:
   to a pattern in patterns/
 - Patterns that have become too specific and should demote to knowledge/
 
-### 5. Structural Issues
+### 5. Local Project Lessons
+
+If `.claude/knowledge/` exists in the current working directory, also
+scan it for:
+- Lessons general enough to promote to global `knowledge/`
+- Skip any lesson marked `local-only: true`
+- For each promotion candidate, state what would need to be generalized
+
+### 6. Structural Issues
 
 Check:
 - Any files missing attribution headers
