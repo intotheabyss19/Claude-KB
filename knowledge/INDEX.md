@@ -16,7 +16,7 @@ file. Always mention to the user that a KB entry was found.
 - keyword4, keyword5 → patterns/pattern.md
 -->
 
-*No domain files yet. Entries will be added as lessons accumulate.*
+- graphify, knowledge graph, map codebase, code graph, GRAPH_REPORT, unfamiliar codebase, project map → knowledge/tooling.md
 
 ## Patterns (cross-domain)
 
