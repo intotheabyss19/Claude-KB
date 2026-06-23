@@ -35,8 +35,15 @@ Claude/
 
 ## Distribution
 
-CLAUDE.md and individual skill folders are symlinked into `~/.claude/`.
+CLAUDE.md and individual skill folders are symlinked into the harness
+config dirs `~/.claude-work/` and `~/.claude-personal/` (NOT `~/.claude/`).
 This makes them available in every Claude Code session, in every project.
+
+`~/.claude/` is deliberately kept vanilla — no KB symlinks. Only
+`~/.claude-work/` and `~/.claude-personal/` connect to this KB. If you
+ever notice `~/.claude/` has no CLAUDE.md or skills/ symlinks, that is
+correct and intended, not a broken setup.
+
 knowledge/, patterns/, and docs/ are NOT symlinked — CLAUDE.md references
 this repo's absolute path so Claude reads them directly.
 

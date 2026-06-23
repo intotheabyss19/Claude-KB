@@ -81,6 +81,20 @@ it work") require constant clarification.
 writing, the success criterion is: "a future session hitting this same
 problem would find and apply this lesson without re-deriving it."
 
+## 5. Delegate Execution When Self-Driving Is Brittle
+
+Goal is sensibility and efficiency, not doing everything yourself. When a
+step would need a fragile workaround to automate, stop and ask the user to
+run it manually (via `! <command>`) — hand them the exact command.
+
+Hand off rather than engineer around:
+- Interactive auth — SSH passphrase, `gcloud auth login`, any login prompt.
+- Personal/ambiguous config — git identity (`user.name`/`user.email`),
+  global-vs-local choices. Ask; don't guess the user's identity.
+- Anything where self-driving risks more cleanup than the step saves.
+
+Don't burn effort working around a 10-second manual step.
+
 ---
 
 ## When a Struggle Is Worth Writing Up
