@@ -20,6 +20,7 @@ Measured 2026-06-25. Description chars are the per-turn cost.
 | compress | 136 | custom | shrink/compress a markdown/KB file (no LLM) |
 | project | 169 | custom | "save this lesson" / capture a project lesson |
 | review-knowledge-base | 175 | custom | "review the knowledge base" |
+| learn-kb | 199 | custom | `/learn-kb`; a newcomer asks "what is this / how do I use it" |
 | verify-security | 260 | vendor:agent-verifier | whole-repo secret/dep/injection scan |
 | interview-me | 485 | vendor:agent-skills | underspecified ask; "interview me" |
 | debugging-and-error-recovery | 249 | vendor:agent-skills | systematic root-cause debugging |
@@ -37,7 +38,7 @@ Measured 2026-06-25. Description chars are the per-turn cost.
 | umap-learn | 187 | vendor:scientific | dimensionality reduction |
 | pymc | 175 | vendor:scientific | Bayesian modeling |
 
-**Budget ledger:** 22 active · **6,785 / 8,000 chars** · headroom **1,215**.
+**Budget ledger:** 23 active · **6,984 / 8,000 chars** · headroom **1,016**.
 Soft-warn at 6,500 (passed — be selective); hard stop at 8,000. Before
 activating a skill, add its description chars here and refuse if the new
 total would exceed 8,000.

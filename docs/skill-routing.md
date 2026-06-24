@@ -18,6 +18,9 @@ Current skills and their triggers:
 - **code-review** — reviewing diffs, PRs, code review
 - **project** — "save this lesson", "capture this", project-local lesson capture
 - **review-knowledge-base** — "review the knowledge base", monthly health check
+- **learn-kb** — `/learn-kb`; newcomer onboarding, one simple lesson per visit
+  (progress saved in `$HOME/.claude-kb-learn-progress`). Built for sharing the
+  KB with non-technical friends.
 - **verify-security** — *(vendored, Aurite-ai)* "verify security", "scan for
   secrets/vulnerabilities", "security audit" of a codebase. Read-only static
   scan. Note overlap to keep distinct: built-in `/security-review` = pending

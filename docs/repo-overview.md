@@ -26,7 +26,8 @@ Claude/
 │   ├── commit-messages/   — conventional commit generation
 │   ├── code-review/       — terse one-line-per-finding reviews
 │   ├── project/           — project-local lesson capture + promotion
-│   └── review-knowledge-base/ — monthly KB health check
+│   ├── review-knowledge-base/ — monthly KB health check
+│   └── learn-kb/          — friendly one-lesson-at-a-time onboarding for newcomers
 ├── vendor/                — third-party skills (submodules + plain copies)
 │   ├── scientific-agent-skills/ — K-Dense-AI sci skills (147; MIT submodule)
 │   ├── agent-verifier/    — Aurite-ai verify-* skills (5; MIT plain copy)
