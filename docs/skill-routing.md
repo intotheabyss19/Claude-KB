@@ -18,6 +18,11 @@ Current skills and their triggers:
 - **code-review** — reviewing diffs, PRs, code review
 - **project** — "save this lesson", "capture this", project-local lesson capture
 - **review-knowledge-base** — "review the knowledge base", monthly health check
+- **verify-security** — *(vendored, Aurite-ai)* "verify security", "scan for
+  secrets/vulnerabilities", "security audit" of a codebase. Read-only static
+  scan. Note overlap to keep distinct: built-in `/security-review` = pending
+  git changes; `code-review` = diff quality; `verify-security` = whole-project
+  secret/dep/injection scan.
 
 ### Description budget
 

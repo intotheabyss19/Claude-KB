@@ -26,8 +26,9 @@ Claude/
 │   ├── code-review/       — terse one-line-per-finding reviews
 │   ├── project/           — project-local lesson capture + promotion
 │   └── review-knowledge-base/ — monthly KB health check
-├── vendor/                — third-party skill libraries (git submodules)
-│   └── scientific-agent-skills/ — K-Dense-AI sci skills (147; MIT)
+├── vendor/                — third-party skills (submodules + plain copies)
+│   ├── scientific-agent-skills/ — K-Dense-AI sci skills (147; MIT submodule)
+│   └── agent-verifier/    — Aurite-ai verify-* skills (5; MIT plain copy)
 ├── patterns/              — architecture/design how-to (rare writes)
 │   ├── skill-authoring.md
 │   ├── subagent-design.md
@@ -71,6 +72,22 @@ the symlinks (the library copy stays).
 
 **To update the library:** `git submodule update --remote vendor/scientific-agent-skills`
 then commit the bumped pointer.
+
+## Vendored Agent-Verifier
+
+`vendor/agent-verifier/` is the Aurite-ai agent-verifier skill set, vendored
+as a **plain copy** (not a submodule — the upstream repo is 6.5 MB of mostly
+a demo GIF, vs 48 KB of actual skills). MIT licensed. Holds 5 skills;
+provenance + security review in `vendor/agent-verifier/PROVENANCE.md`.
+
+**Active subset:** only `verify-security` is symlinked into both config dirs
+(read-only static scan for secrets, unpinned deps, injection, info leakage,
+insecure defaults). The other four (`verify-quality`, `verify-patterns`,
+`verify-language`, `verification`) are dormant on disk at zero token cost —
+activate with the same `ln -sfn` pattern as the scientific skills.
+
+**To update:** re-copy `skills/` from upstream (see PROVENANCE.md), bump the
+pinned commit, re-apply any local description tuning.
 
 ## Git
 
