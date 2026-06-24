@@ -23,3 +23,8 @@ file. Always mention to the user that a KB entry was found.
 - skill, SKILL.md, description, frontmatter → patterns/skill-authoring.md
 - subagent, multi-agent, investigator, builder, reviewer, decompose, fan out, orchestrate, parallel agents, when to use subagents, workflow shapes → patterns/subagent-design.md
 - memory, consolidation, episodic, semantic → patterns/memory-consolidation.md
+
+## Docs (on-demand reference — not auto-loaded)
+
+- lesson format, domain file, TOC, split limit, how to store a lesson, knowledge architecture → docs/knowledge-architecture.md
+- capture a project lesson, promote to global, local-only lesson, /project lifecycle → docs/project-lifecycle.md

@@ -1,63 +1,20 @@
 # Skill Routing
 
-How Claude decides which skill or knowledge-base entry to load.
-
----
+Two routing tracks, both auto-loaded so they work every session.
 
 ## Skills (auto-fire on description match)
+The harness shows every ACTIVE skill's `description` each turn and loads its
+full SKILL.md body only on intent match (slash commands work too). The active
+set, per-skill triggers, and the shared **~8,000-char description budget** live
+in `skills/REGISTRY.md` — the single source of truth, not hand-listed here (so
+the doc can't drift from disk). Keep descriptions specific to avoid false
+matches; body length doesn't affect the budget.
 
-Skills in `skills/` use standard Claude Code routing: the model sees
-each skill's description every turn and loads the full SKILL.md body
-when the description matches the user's intent. All skills auto-fire
-on match — no explicit invocation required (though slash commands work
-too).
+## Knowledge & patterns (INDEX keyword map)
+`knowledge/` + `patterns/` are NOT description-routed. `knowledge/INDEX.md` is a
+keyword→file map, `@imported` every session (0 description budget). On a keyword
+match: read the file, briefly mention the KB entry was found, apply if relevant.
+Update INDEX when adding a domain file.
 
-Current skills and their triggers:
-- **compress** — prose compression, token reduction, shrink a file
-- **commit-messages** — generating commit messages, conventional commits
-- **code-review** — reviewing diffs, PRs, code review
-- **project** — "save this lesson", "capture this", project-local lesson capture
-- **review-knowledge-base** — "review the knowledge base", monthly health check
-- **learn-kb** — `/learn-kb`; newcomer onboarding, one simple lesson per visit
-  (progress saved in `$HOME/.claude-kb-learn-progress`). Built for sharing the
-  KB with non-technical friends.
-- **verify-security** — *(vendored, Aurite-ai)* "verify security", "scan for
-  secrets/vulnerabilities", "security audit" of a codebase. Read-only static
-  scan. Note overlap to keep distinct: built-in `/security-review` = pending
-  git changes; `code-review` = diff quality; `verify-security` = whole-project
-  secret/dep/injection scan.
-
-### Description budget
-
-All skill descriptions share ~8,000 chars. Keep descriptions specific
-to avoid false matches. The full SKILL.md body only loads on match,
-so body length doesn't affect the budget.
-
-## Knowledge & Patterns (keyword hints in CLAUDE.md)
-
-Knowledge-base files (`knowledge/`, `patterns/`) are NOT routed via
-the skill description system. Instead, `knowledge/INDEX.md` contains
-a keyword map — topic keywords pointing to relevant domain files.
-CLAUDE.md @imports INDEX.md, so it's loaded every session.
-
-When Claude sees a keyword match while working on a task:
-1. Read the relevant knowledge/pattern file
-2. **Always mention briefly** that a KB entry was found
-3. Apply the lesson if relevant
-
-This costs zero description budget (loaded via CLAUDE.md @import).
-Update INDEX.md when adding new domain files or lessons.
-
-## Modifying the Knowledge Base
-
-**Always confirm with the user before modifying any file in knowledge/
-or patterns/.** Claude should never auto-edit, auto-merge, or auto-delete
-knowledge-base content. Propose the change, state what and why, wait
-for approval.
-
-This applies to:
-- Adding new lessons
-- Updating existing lessons
-- Merging or consolidating files
-- Promoting knowledge/ entries to patterns/
-- Any structural changes
+Modifying KB content (add/remove/change) → follow **"Before Changing the KB"**
+in `working-rules.md` (always loaded).

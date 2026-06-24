@@ -19,10 +19,7 @@ Lessons, patterns, and skills that compound over time.
 
 @/home/ysh/Desktop/Obsidian/Prompts/Claude/docs/skill-routing.md
 
-## Knowledge Architecture
-
-@/home/ysh/Desktop/Obsidian/Prompts/Claude/docs/knowledge-architecture.md
-
-## Project Lifecycle
-
-@/home/ysh/Desktop/Obsidian/Prompts/Claude/docs/project-lifecycle.md
+<!-- knowledge-architecture.md + project-lifecycle.md are intentionally NOT
+@imported (saves ~2k tokens/session). They load on demand via INDEX.md when a
+KB-maintenance task needs them; their must-follow rules are summarized in
+working-rules.md "Before Changing the KB". -->
