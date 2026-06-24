@@ -21,5 +21,5 @@ file. Always mention to the user that a KB entry was found.
 ## Patterns (cross-domain)
 
 - skill, SKILL.md, description, frontmatter → patterns/skill-authoring.md
-- subagent, multi-agent, investigator, builder, reviewer → patterns/subagent-design.md
+- subagent, multi-agent, investigator, builder, reviewer, decompose, fan out, orchestrate, parallel agents, when to use subagents, workflow shapes → patterns/subagent-design.md
 - memory, consolidation, episodic, semantic → patterns/memory-consolidation.md

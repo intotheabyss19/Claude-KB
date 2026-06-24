@@ -17,6 +17,49 @@ Subagents that speak terse consume ~60% fewer tokens than vanilla agents.
 This means the PARENT's context lasts longer — the subagent's compressed
 summary takes less space when injected back.
 
+## When to Reach for Subagents (Decomposition Playbook)
+
+**The default is solo.** A subagent or workflow only earns its token cost
+when the work is big or benefits from independence. Reach for them when:
+
+- **Breadth** — the answer needs sweeping many files/sources. Fan out
+  read-only investigators; keep the conclusion, not the file dumps.
+- **Confidence** — a finding should be checked by a skeptic before you
+  trust it. Spawn adversarial reviewers (verify before you commit).
+- **Scale beyond one context** — a migration/audit/sweep too big for one
+  window. Pipeline over the work-list.
+- **Diverse perspectives** — a design or artifact improves from N
+  independent angles. Draft → multi-lens critique → synthesize.
+
+**Stay solo when:** a single-fact lookup, a small bounded edit, a
+conversational turn, or anything where orchestration overhead exceeds the
+work. Don't fan out to look busy.
+
+### Which tool
+- **Agent tool** — one-off subagent for a self-contained sub-task (a search,
+  a review, a build). Ad-hoc, model-driven delegation.
+- **Workflow tool** — deterministic multi-stage orchestration (loops,
+  fan-out, pipeline) where control flow should be code, not model whim. Use
+  when you need N stages, barriers, or loop-until-done.
+
+### Orchestration shapes (each proven in this KB's own build)
+- **Fan-out + synthesize** — N parallel workers on independent slices → one
+  merger (e.g. multi-lens repo/security analysis).
+- **Pipeline** — each item flows through stages independently, no barrier.
+  Default for multi-stage per-item work.
+- **Draft → critique → synthesize** — one drafts, M critics from distinct
+  lenses, one integrates. Beats one-shot for design/authoring.
+- **Adversarial verify** — skeptics prompted to refute a finding; keep it
+  only if it survives. Kills plausible-but-wrong.
+- **Loop-until-dry** — keep spawning finders until K rounds surface nothing
+  new (unknown-size discovery).
+
+### Cost discipline
+Subagents multiply tokens — each stage × each agent. Scale the fleet to the
+task: a quick check = 1–2 agents; "be thorough / audit this" = larger pool +
+an adversarial pass. Always prefer a conclusion returned over raw context
+pulled into the parent. Design each spawned agent per the roles below.
+
 ## Three-Role Taxonomy
 
 ### Investigator (Read-Only Locator)
