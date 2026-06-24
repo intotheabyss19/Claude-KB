@@ -11,12 +11,11 @@ file. Always mention to the user that a KB entry was found.
 
 ## Domain Map
 
-<!-- Add entries as domain files are created. Format:
-- keyword1, keyword2, keyword3 → knowledge/domain.md
-- keyword4, keyword5 → patterns/pattern.md
--->
+> Format: `keyword1, keyword2 → knowledge/domain.md`. One line per domain file.
+> Query-time graph requests ("map a codebase") are owned by the graphify
+> *skill*, not this map — INDEX only routes the install/config gotcha below.
 
-- graphify, knowledge graph, map codebase, code graph, GRAPH_REPORT, unfamiliar codebase, project map → knowledge/tooling.md
+- graphify install, graphify setup, CLAUDE_CONFIG_DIR, graphify-out gitignore, "do not graph the KB", graphify update → knowledge/tooling.md
 - eris, shipd, challenge, public.zip, setup_challenge, dataset/public, submission.csv, benchmark challenge → knowledge/eris.md
 
 ## Patterns (cross-domain)
