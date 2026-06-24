@@ -130,6 +130,18 @@ prefer the safer alternative. Trivial transparent commands (`ls`,
 `git status`, `cp` of already-audited files) are exempt — judgment, not
 ceremony.
 
+## 8. Track Multi-Step Work With the Task List
+
+Use the harness task list (TaskCreate / TaskUpdate / TaskList) for any task
+with ~3+ steps or spanning multiple tool calls — as working memory, not
+theater.
+
+- Create tasks up front; keep exactly one `in_progress`; flip to `completed`
+  only when truly done (rule 4's verify must pass first).
+- Keep it current — add tasks you discover; park blocked ones with the reason.
+- It's ephemeral (per session). Durable goals, constraints, and lessons belong
+  in memory or `.claude/knowledge/`, not the task list.
+
 ---
 
 ## When a Struggle Is Worth Writing Up

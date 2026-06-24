@@ -102,6 +102,24 @@ pinned commit, re-apply any local description tuning.
 budget. Consult and update it on every activation/deactivation. It is NOT
 @imported, so it costs nothing at session time.
 
+## Sharing this KB
+
+The skill *files* are committed, but activation (config-dir symlinks) and the
+science submodule are machine-specific, so they don't "just work" on a clone.
+To share, a friend clones with submodules and runs the installer:
+
+```sh
+git clone --recurse-submodules git@github.com:intotheabyss19/Claude-KB.git
+cd Claude-KB && ./setup.sh        # symlinks active skills into ~/.claude
+```
+
+`setup.sh` pulls the submodule and links the active skill set into the friend's
+Claude config dir (default `~/.claude`; `--config DIR` to override, e.g. the
+personal/work split). Then `/learn-kb` onboards them one lesson at a time. The
+active vendored list lives in `setup.sh` (`VENDOR_ACTIVE`) — keep it in sync
+with `skills/REGISTRY.md`. It does not install the rules/knowledge layer
+(machine-specific paths) — skills work without it.
+
 ## Git
 
 Every update is a reviewable commit. No silent mutations. Git history

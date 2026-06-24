@@ -79,6 +79,8 @@ total would exceed 8,000.
 2. `ln -sfn <KB>/vendor/<repo>/skills/<name> ~/.claude-personal/skills/<name>`
    and repeat for `~/.claude-work/skills/<name>` (BOTH dirs).
 3. Add the row here; bump the ledger total.
+4. If it's a vendored skill, add its path to `setup.sh` `VENDOR_ACTIVE` too, so
+   shared installs activate it as well.
 
 ## Reconcile registry vs disk
 
