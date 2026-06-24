@@ -1,3 +1,7 @@
+---
+name: project
+description: Capture a project-specific lesson from a hard problem into local .claude/knowledge/. Use on "save this lesson", "capture this", or after a painful fix worth remembering.
+---
 # Skill: Project
 
 Capture project-specific lessons from hard problems into local

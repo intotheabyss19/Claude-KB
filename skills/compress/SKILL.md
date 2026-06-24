@@ -1,3 +1,7 @@
+---
+name: compress
+description: Regex-based deterministic prose compression (no LLM, ~40% token reduction). Use to compress or shrink a markdown or knowledge-base file.
+---
 # Skill: Compress
 
 Regex-based deterministic prose compression for knowledge-base files.

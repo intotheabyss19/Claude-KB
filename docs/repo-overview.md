@@ -21,6 +21,7 @@ Claude/
 │   ├── knowledge-architecture.md — lesson storage design
 │   └── project-lifecycle.md      — /project command design (pending design)
 ├── skills/                — custom skills (symlinked into work/personal dirs)
+│   ├── REGISTRY.md        — single source of truth: active set + budget ledger
 │   ├── compress/          — regex-based prose compression
 │   ├── commit-messages/   — conventional commit generation
 │   ├── code-review/       — terse one-line-per-finding reviews
@@ -28,7 +29,10 @@ Claude/
 │   └── review-knowledge-base/ — monthly KB health check
 ├── vendor/                — third-party skills (submodules + plain copies)
 │   ├── scientific-agent-skills/ — K-Dense-AI sci skills (147; MIT submodule)
-│   └── agent-verifier/    — Aurite-ai verify-* skills (5; MIT plain copy)
+│   ├── agent-verifier/    — Aurite-ai verify-* skills (5; MIT plain copy)
+│   ├── agent-skills/      — addyosmani eng skills (24; MIT; skills only, no hooks)
+│   ├── anthropics-skills/ — skill-creator + webapp-testing (official)
+│   └── skills-catalog/    — obviousworks README (reference index, not skills)
 ├── patterns/              — architecture/design how-to (rare writes)
 │   ├── skill-authoring.md
 │   ├── subagent-design.md
@@ -88,6 +92,14 @@ activate with the same `ln -sfn` pattern as the scientific skills.
 
 **To update:** re-copy `skills/` from upstream (see PROVENANCE.md), bump the
 pinned commit, re-apply any local description tuning.
+
+## Skill Registry
+
+`skills/REGISTRY.md` is the single source of truth for which skills are
+**active** (symlinked, costing description budget every turn) vs **dormant**
+(on disk, zero tokens), with a measured char-count ledger against the ~8,000
+budget. Consult and update it on every activation/deactivation. It is NOT
+@imported, so it costs nothing at session time.
 
 ## Git
 

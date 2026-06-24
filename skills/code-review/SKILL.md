@@ -1,3 +1,7 @@
+---
+name: code-review
+description: Terse code review of a diff or PR — one line per finding (location, problem, fix), no preamble. Use when reviewing code changes, a diff, or a pull request for bugs and quality.
+---
 # Skill: Code Review
 
 One line per finding. Location, problem, fix. No throat-clearing.

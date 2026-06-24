@@ -1,7 +1,7 @@
 ---
 name: verify-security
 version: "1.0.0"
-description: Verify code for security issues including hardcoded secrets, input validation, error exposure, and dependency vulnerabilities. Use when asked to "verify security", "check for secrets", or "scan for vulnerabilities".
+description: Read-only whole-repo static scan for hardcoded secrets, unpinned dependencies, injection sinks, info leakage, and insecure defaults. Use on "scan for secrets/vulnerabilities" or "security audit" of a codebase — not a git-diff review (that is /security-review).
 ---
 
 # Security Verification

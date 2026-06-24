@@ -1,3 +1,7 @@
+---
+name: commit-messages
+description: Generate terse conventional-format commit messages (why over what). Use when writing a commit message or committing staged changes.
+---
 # Skill: Commit Messages
 
 Generates terse, conventional-format commit messages. Why over what.

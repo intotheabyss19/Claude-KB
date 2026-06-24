@@ -1,3 +1,7 @@
+---
+name: review-knowledge-base
+description: Periodic read-only health check of the knowledge base — staleness, duplication, oversize files, promotion candidates. Use on "review the knowledge base" or a monthly KB audit.
+---
 # Skill: Review Knowledge Base
 
 Manual-only skill for periodic health checks of the knowledge base.
