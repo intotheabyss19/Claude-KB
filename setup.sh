@@ -53,6 +53,7 @@ VENDOR_ACTIVE=(
   "vendor/agent-verifier/skills/verify-security"
   "vendor/agent-skills/skills/interview-me"
   "vendor/agent-skills/skills/debugging-and-error-recovery"
+  "vendor/agent-skills/skills/spec-driven-development"
   "vendor/anthropics-skills/skills/skill-creator"
   "vendor/scientific-agent-skills/skills/scikit-learn"
   "vendor/scientific-agent-skills/skills/transformers"

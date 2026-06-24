@@ -21,10 +21,12 @@ Measured 2026-06-25. Description chars are the per-turn cost.
 | project | 169 | custom | "save this lesson" / capture a project lesson |
 | review-knowledge-base | 175 | custom | "review the knowledge base" |
 | learn-kb | 199 | custom | `/learn-kb`; a newcomer asks "what is this / how do I use it" |
+| ml-challenge | 217 | custom | complex ML/DL challenge (bio/NLP/obscure domains); not routine sklearn |
 | verify-security | 260 | vendor:agent-verifier | whole-repo secret/dep/injection scan |
 | interview-me | 485 | vendor:agent-skills | underspecified ask; "interview me" |
 | debugging-and-error-recovery | 249 | vendor:agent-skills | systematic root-cause debugging |
 | skill-creator | 319 | vendor:anthropics | create/edit/eval a skill |
+| spec-driven-development | 202 | vendor:agent-skills | spec-first; new project/feature or vague requirements |
 | optimize-for-gpu | 735 | vendor:scientific | GPU/CUDA acceleration |
 | shap | 501 | vendor:scientific | model explainability |
 | pufferlib | 409 | vendor:scientific | high-perf RL |
@@ -38,7 +40,7 @@ Measured 2026-06-25. Description chars are the per-turn cost.
 | umap-learn | 187 | vendor:scientific | dimensionality reduction |
 | pymc | 175 | vendor:scientific | Bayesian modeling |
 
-**Budget ledger:** 23 active · **6,984 / 8,000 chars** · headroom **1,016**.
+**Budget ledger:** 25 active · **7,403 / 8,000 chars** · headroom **597**.
 Soft-warn at 6,500 (passed — be selective); hard stop at 8,000. Before
 activating a skill, add its description chars here and refuse if the new
 total would exceed 8,000.
