@@ -67,8 +67,15 @@ run git -C "$KB_DIR" submodule update --init --recursive \
   || say "  ! submodule init failed (offline?) — scientific skills will be skipped"
 
 # --- 2. collect active skill source dirs ---
+# Custom skills that are PROJECT-level only (not global) — skip in this global
+# installer. Keep in sync with REGISTRY's Project-active section(s).
+PROJECT_ONLY="ml-challenge"
 SKILL_SRCS=()
-for d in "$KB_DIR"/skills/*/; do [ -d "$d" ] && SKILL_SRCS+=("${d%/}"); done   # custom
+for d in "$KB_DIR"/skills/*/; do
+  [ -d "$d" ] || continue
+  case " $PROJECT_ONLY " in *" $(basename "$d") "*) continue ;; esac   # skip project-only
+  SKILL_SRCS+=("${d%/}")
+done
 for rel in "${VENDOR_ACTIVE[@]}"; do SKILL_SRCS+=("$KB_DIR/$rel"); done          # vendored-active
 
 # --- 3. symlink into each config dir ---

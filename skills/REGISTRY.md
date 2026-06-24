@@ -16,7 +16,7 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 
 | Skill | Chars | Source | Trigger |
 |-------|------:|--------|---------|
-| graphify | 355 | custom | any codebase/architecture question; `/graphify` |
+| graphify | 355 | external¹ | any codebase/architecture question; `/graphify` |
 | code-review | 176 | custom | review a diff/PR for bugs + quality |
 | commit-messages | 131 | custom | write a commit message |
 | compress | 136 | custom | shrink/compress a markdown/KB file (no LLM) |
@@ -30,6 +30,9 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 | spec-driven-development | 202 | vendor:agent-skills | spec-first; new project/feature or vague requirements |
 
 **Global budget ledger:** 12 active · **2,856 / 8,000 chars** · headroom **5,144**.
+¹ `graphify` is installed separately (`~/.claude/skills/graphify`), NOT in this
+repo — `setup.sh` does not recreate it. Counted in the live budget because its
+description loads when present; exclude it (−355) for the repo-reproducible set.
 Soft-warn at 6,500; hard stop at 8,000. Before activating globally, add the
 description chars here; refuse if the new total would exceed 8,000.
 
