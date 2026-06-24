@@ -49,9 +49,12 @@ rules/knowledge layer — skills work without it).
 
 ## Attribution & licenses
 
-- This repository is licensed under **GPL-3.0** (see [`LICENSE`](LICENSE)).
-- **Vendored skill packs retain their own licenses** (mostly MIT) — see each
-  `vendor/<pack>/PROVENANCE.md`.
+- This repository's original work is licensed under the **MIT License** (see
+  [`LICENSE`](LICENSE)).
+- **Vendored skill packs retain their own licenses** (all MIT) — the MIT
+  `LICENSE` here does not relicense them; see each `vendor/<pack>/PROVENANCE.md`
+  and the pack's own `LICENSE`. The `scientific-agent-skills` submodule carries
+  its own license.
 - Output-style + subagent patterns adapted from
   [caveman](https://github.com/JuliusBrussee/caveman) /
   [caveman-code](https://github.com/JuliusBrussee/caveman-code)
