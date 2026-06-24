@@ -17,6 +17,7 @@ file. Always mention to the user that a KB entry was found.
 -->
 
 - graphify, knowledge graph, map codebase, code graph, GRAPH_REPORT, unfamiliar codebase, project map → knowledge/tooling.md
+- eris, shipd, challenge, public.zip, setup_challenge, dataset/public, submission.csv, benchmark challenge → knowledge/eris.md
 
 ## Patterns (cross-domain)
 
