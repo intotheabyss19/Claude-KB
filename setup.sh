@@ -55,18 +55,10 @@ VENDOR_ACTIVE=(
   "vendor/agent-skills/skills/debugging-and-error-recovery"
   "vendor/agent-skills/skills/spec-driven-development"
   "vendor/anthropics-skills/skills/skill-creator"
-  "vendor/scientific-agent-skills/skills/scikit-learn"
-  "vendor/scientific-agent-skills/skills/transformers"
-  "vendor/scientific-agent-skills/skills/pytorch-lightning"
-  "vendor/scientific-agent-skills/skills/torch-geometric"
-  "vendor/scientific-agent-skills/skills/stable-baselines3"
-  "vendor/scientific-agent-skills/skills/pufferlib"
-  "vendor/scientific-agent-skills/skills/shap"
-  "vendor/scientific-agent-skills/skills/umap-learn"
-  "vendor/scientific-agent-skills/skills/statsmodels"
-  "vendor/scientific-agent-skills/skills/pymc"
-  "vendor/scientific-agent-skills/skills/optimize-for-gpu"
-  "vendor/scientific-agent-skills/skills/timesfm-forecasting"
+  # NOTE: the 12 scientific ML skills + ml-challenge are intentionally NOT
+  # global-active — they are project-level (~/Projects/Eris/.claude/skills/).
+  # A friend who wants them globally can symlink any from
+  # vendor/scientific-agent-skills/skills/ per skill (watch the budget).
 )
 
 # --- 1. pull the scientific-agent-skills submodule (12 active + 135 dormant) ---
