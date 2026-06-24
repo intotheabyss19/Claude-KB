@@ -142,6 +142,21 @@ theater.
 - It's ephemeral (per session). Durable goals, constraints, and lessons belong
   in memory or `.claude/knowledge/`, not the task list.
 
+## 9. Self-Maintenance & Sync
+
+Keep the KB improving and synced without being asked — but never at the cost of
+curation or review.
+
+- **Capture insights** as they arise: append a dated one-liner to
+  `knowledge/_inbox.md` (append-only quarantine, NOT `@imported` = 0 tokens).
+  Don't touch curated domain files unattended.
+- **Promotion is gated:** moving an `_inbox` item into a curated `knowledge/`
+  or `patterns/` file stays human-approved (via `/review-knowledge-base`).
+- **Commit your own KB changes** before ending, with curated messages — the
+  reviewable-commit rule still holds; no `git add -A` dumps.
+- **Sync is automatic:** the `kb-autopush` Stop-hook pushes unpushed `main`
+  commits via the deploy key (push-only; it never commits for you).
+
 ---
 
 ## When a Struggle Is Worth Writing Up
