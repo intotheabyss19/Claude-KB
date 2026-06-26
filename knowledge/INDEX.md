@@ -17,6 +17,9 @@ file. Always mention to the user that a KB entry was found.
 
 - graphify install, graphify setup, CLAUDE_CONFIG_DIR, graphify-out gitignore, "do not graph the KB", graphify update → knowledge/tooling.md
 - eris, shipd, challenge, public.zip, setup_challenge, dataset/public, submission.csv, benchmark challenge → knowledge/eris.md
+- model challenge, red team, eval design, benchmark design, adversarial task, make it hard, stump the model, frontier model fail, difficulty design, can't challenge the model → knowledge/model-challenge-design.md
+- llm mastery, become master at LLM, mastery roadmap, prediction log, capability map, calibration, use LLMs to full potential, exponential growth frontier models, guide/break/amplify models → knowledge/llm-mastery-roadmap.md
+- bash script, shell script, write a .sh, rg, ripgrep, grep -r, jq parsing, rg --json, scope a search, exclude vendor/node_modules → knowledge/shell.md
 
 ## Patterns (cross-domain)
 

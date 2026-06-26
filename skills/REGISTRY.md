@@ -28,9 +28,10 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 | debugging-and-error-recovery | 249 | vendor:agent-skills | systematic root-cause debugging |
 | skill-creator | 319 | vendor:anthropics | create/edit/eval a skill |
 | spec-driven-development | 202 | vendor:agent-skills | spec-first; new project/feature or vague requirements |
-| bash-expert | 154 | custom (rd-mg, fish pruned) | writing/reviewing shell scripts |
 
-**Global budget ledger:** 13 active · **3,010 / 8,000 chars** · headroom **4,990**.
+**Global budget ledger:** 12 active · **2,856 / 8,000 chars** · headroom **5,144**.
+Shell `rg`/`jq` reference lives in `knowledge/shell.md` (INDEX-routed, 0 budget),
+not as a skill — reference, not a procedure.
 ¹ `graphify` is installed separately (`~/.claude/skills/graphify`), NOT in this
 repo — `setup.sh` does not recreate it. Counted in the live budget because its
 description loads when present; exclude it (−355) for the repo-reproducible set.
