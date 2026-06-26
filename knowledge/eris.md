@@ -20,6 +20,8 @@ reads `dataset/public/`, writes `working/submission.csv`.
 - Know when you've hit the Bayes ceiling — quantify determinacy, then stop
 - Tuned-to-train knobs regress on OOD-hardened test; ship only principled fixes
 - Submission credits are scarce — probes usually confirm the ceiling, budget them
+- Eris grades solution.py in isolation — make it self-contained (no local imports)
+- Stellar Transit: classification is the lever — river-plot CNN + smoothness feats + physics ensemble
 
 ---
 
@@ -339,3 +341,54 @@ and stop after the first that confirms the ceiling — the rest will too. NEVER 
 the last credit or two on a fish; keep one in reserve to re-assert your best if the
 platform is last-submission-wins. When the principled analysis says "at ceiling,
 gap is noise", believe it instead of buying the same answer with credits.
+
+### Eris grades solution.py in isolation — make it self-contained (no local imports)
+
+**Context:** Eris challenge. After you produce `working/submission.csv`, the
+platform runs TWO separate gradings: (1) the uploaded CSV against the test key,
+and (2) re-executing your `solution.py` — copied ALONE into an isolated dir
+(`/root/setup/solution/solution.py`) — to verify reproducibility.
+**Problem:** A `solution.py` that does `import pipe` (or any local helper module
+you wrote) fails the SCRIPT grading: `ModuleNotFoundError: No module named
+'pipe'` — even though the CSV upload scored fine. Local helper modules are not
+copied alongside it. Splitting the solution across files breaks reproduction.
+**Fix:** The canonical root `solution.py` MUST be self-contained — only stdlib +
+installed packages (numpy/pandas/torch/scipy/sklearn/cv2), NO local imports;
+inline whatever it needs. Standard solved-challenge layout (matches Switch-Lamp,
+Inferring-Hidden-Populations): `src/` = dev/helper modules you iterate in
+(pipe.py, builders, CNN trainers, validators); root `solution.py` = the
+self-contained canonical the platform runs; `attemptN/` = per-iteration snapshots
+(`solution.py` + `submission.csv` + `approach.txt`); `working/` = live
+`submission.csv` + build artifacts. VERIFY self-containment by moving the helper
+modules OUT of cwd (into `src/`) and running `python solution.py` — if it imports
+a local module it will fail exactly like the platform.
+
+### Stellar Transit: classification is the lever — river-plot CNN + smoothness feats + physics ensemble
+
+**Context:** Eris "Stellar Transit / Syzygy" — a 1600-px brightness scan
+(40×40) with regularly-spaced dips at known spacing P, drifted off the lattice
+by a slow sinusoid. Predict `regime∈{none,weak,strong}` (the drift amplitude
+bin, macro-F1) and `next_pos` (next dip past px 1599, `exp(-|Δ|/1.5)`); score =
+`0.5·macroF1 + 0.5·localization`. A physics pipeline (dip-localize → robust
+lattice+drift sinusoid fit → threshold amplitude) plateaus ~71 (macroF1 0.82);
+spot-banding produces a spurious high-amplitude tail on `none`.
+**Problem:** Easy to keep tuning the physics fit, but it's near its limit and the
+none/weak boundary stays blurred.
+**Fix:** Decompose the score FIRST — perfect classification → composite ceiling
+~82.6, so CLASSIFICATION is the dominant lever, not localization. Test the noise
+nature: per-dip residual std ≈1.55px and INDEPENDENT of dip depth ⇒ irreducible
+PLACEMENT noise ⇒ localization is at the σ/√N ceiling (don't chase it; the failed
+high-resid drift fits are unrecoverable — verified with find_peaks, 11/156).
+Classification wins (0.82→0.857 macroF1, 71→74.25 composite): (1) a lattice-folded
+**river-plot** CNN representation — matched-filter windows (±20px) sampled around
+each `φ0+k·P`, stacked into a (K,M) image where the dip ridge snakes with the
+drift; P-invariant and detection-soft, so it sidesteps the spot-banding amplitude
+blow-up. Dilated convs ALONG the drift axis + test-time aug. (2) amplitude-
+INDEPENDENT **smoothness features** of the lattice residuals (sign-change
+fraction, lag-1/2 autocorrelation, low-freq ratio) — separate `none` (white
+residuals) from `weak` (smooth drift) even where amplitude overlaps. (3) ENSEMBLE
+the CNN with a HistGBT on physics+smoothness feats — they make orthogonal errors;
+blend 0.6·CNN+0.4·GBT. For next_pos use a DECOUPLED confident binary drift gate
+(P(drift)>0.8 & resid<3.5), not the 3-class regime (higher precision). Pitfall:
+center-of-mass dip positions are WORSE than sub-pixel parabolic-peak for the 1.5px
+tolerance (wide window trades precision for robustness).
