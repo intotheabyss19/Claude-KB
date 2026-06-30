@@ -28,8 +28,10 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 | debugging-and-error-recovery | 249 | vendor:agent-skills | systematic root-cause debugging |
 | skill-creator | 319 | vendor:anthropics | create/edit/eval a skill |
 | spec-driven-development | 202 | vendor:agent-skills | spec-first; new project/feature or vague requirements |
+| test-driven-development | 231 | vendor:agent-skills | tests-first; implementing logic, fixing a bug, changing behavior (broad — fires on most coding tasks) |
+| postgres | 396 | vendor:ai-skills | read-only SQL against PostgreSQL; schema/table exploration |
 
-**Global budget ledger:** 12 active · **2,856 / 8,000 chars** · headroom **5,144**.
+**Global budget ledger:** 14 active · **3,483 / 8,000 chars** · headroom **4,517**.
 Shell `rg`/`jq` reference lives in `knowledge/shell.md` (INDEX-routed, 0 budget),
 not as a skill — reference, not a procedure.
 ¹ `graphify` is installed separately (`~/.claude/skills/graphify`), NOT in this
@@ -52,9 +54,9 @@ symlinks point at the global KB (`vendor/…` + `skills/ml-challenge`).
 
 - **vendor:agent-verifier** (4): verify-quality, verify-patterns,
   verify-language, verification. → `vendor/agent-verifier/skills/`
-- **vendor:agent-skills** (21 of 24): doubt-driven-development,
+- **vendor:agent-skills** (20 of 24): doubt-driven-development,
   planning-and-task-breakdown, source-driven-development,
-  test-driven-development, incremental-implementation, context-engineering,
+  incremental-implementation, context-engineering,
   idea-refine, documentation-and-adrs, api-and-interface-design,
   frontend-ui-engineering, performance-optimization, code-review-and-quality,
   code-simplification, security-and-hardening, git-workflow-and-versioning,

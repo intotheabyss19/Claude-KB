@@ -54,6 +54,8 @@ VENDOR_ACTIVE=(
   "vendor/agent-skills/skills/interview-me"
   "vendor/agent-skills/skills/debugging-and-error-recovery"
   "vendor/agent-skills/skills/spec-driven-development"
+  "vendor/agent-skills/skills/test-driven-development"
+  "vendor/ai-skills/skills/postgres"
   "vendor/anthropics-skills/skills/skill-creator"
   # NOTE: the 12 scientific ML skills + ml-challenge are intentionally NOT
   # global-active — they are project-level (~/Projects/Eris/.claude/skills/).
