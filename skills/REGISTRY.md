@@ -42,13 +42,20 @@ description chars here; refuse if the new total would exceed 8,000.
 
 ## Project-active: ~/Projects/Eris (symlinked into Eris/.claude/skills/)
 
-Load ONLY inside `~/Projects/Eris/` — 0 cost in every other session. The ML
-stack + the ML-research playbook live here (Eris is the only ML project). All
-symlinks point at the global KB (`vendor/…` + `skills/ml-challenge`).
+Load ONLY inside `~/Projects/Eris/` — 0 cost in every other session. Symlinks
+point at the global KB (`vendor/…` + `skills/ml-challenge`).
 
-`ml-challenge`, `scikit-learn`, `transformers`, `pytorch-lightning`,
-`torch-geometric`, `stable-baselines3`, `pufferlib`, `shap`, `umap-learn`,
-`statsmodels`, `pymc`, `optimize-for-gpu`, `timesfm-forecasting` (13).
+**Lean core (2026-07-02): `ml-challenge`, `scikit-learn`, `transformers` (3).**
+Trimmed from 13 → 3: the Eris session was maxed at ~8,000/8,000 and the other 10
+matched no live challenge. **Routing model:** keep only the always-used core hot;
+read any other skill's body ON DEMAND from `vendor/scientific-agent-skills/skills/
+<name>/SKILL.md` (0 per-turn budget — the budget only pays for the always-on
+`description:` line, not on-demand body reads). `ml-challenge` §4–§5 is the
+routing map for which skill to read per task. Deactivated (read on-demand):
+`pytorch-lightning` (raw PyTorch loops suffice), `optimize-for-gpu` (prep isn't
+the bottleneck), `torch-geometric`/`stable-baselines3`/`pufferlib` (no graph/RL
+challenges), `shap`, `umap-learn`, `statsmodels`, `pymc`, `timesfm-forecasting`.
+Re-symlink any into `Eris/.claude/skills/` if a challenge makes it load-bearing.
 
 ## Dormant pools (on disk, 0 tokens — activate by symlinking)
 
