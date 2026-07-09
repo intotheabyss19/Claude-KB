@@ -77,3 +77,18 @@ lines). Comments must never claim work the code doesn't contain. Rank2's runtime
 derivation + train-consistency gate (already banked as a "steal this" pattern) was the
 compliant version of the exact same rule; he kept his payout. Mandatory pre-submit
 hardcode grep now in Eris solving-workflow.md.
+
+### Rerun-graded competitions: the script's training budget IS the model (Eris Crowd Plurality, 2026-07-10)
+Context: LB scores a fresh 90-min rerun of solution.py, not the uploaded predictions.
+Problem: identical models/blend scored 0.4122 -> 0.4245 -> 0.4449 purely by how many
+ensemble members finished training inside the rerun budget (2 -> ~4 -> all 8); the
+uploaded-CSV score sat at ~0.45 the whole time, masking the leak.
+Fix/lesson: on any rerun-graded platform, engineer the script's throughput before
+tuning the model: (1) fallback submission written first + re-bank output after every
+member; (2) per-member try/except (an OOM member must not kill the run); (3) adaptive
+member gate - measure each member's wall time, start the next only if elapsed +
+1.1*slowest < deadline minus margin (dominates fixed cutoffs, robust to unknown host
+speed); (4) cheapen members losslessly first (bigger batch at same effective batch,
+length-bucketed batching). Also: cross-family LLM ensemble diversity (answer agreement
+~0.5) >> seed reseeds, which saturate after ~2 seeds/family (+0.0017 for 4x); test a
+new family against a PRE-DECLARED solo+blend gate to resist fold-noise seduction.
