@@ -65,3 +65,15 @@ CORRECTION to the 2026-07-09 "Best-of-N private draws" entry above: the $250
 still stands (a5 WAS the best private scorer), but the payout figure is now $18.
 Possible eris.md merge: new lesson "Reviewers judge the code as submitted -
 derive label-derived constants in-code".
+
+### CORRECTION + rule (2026-07-09): Masked Structural 1st REVOKED - label-derived literals
+The "best-of-N private win" below stands STATISTICALLY (scores were real) but the
+$250 was revoked on human review -> $18. Cause: a pasted `np.select` regime rule whose
+class<->interval assignment was learned from train labels offline; a comment claiming
+it was "learned from the training labels" (with no in-code derivation) aggravated it.
+Platform-wide lesson: EDA discoveries are not knowledge you own - the submitted script
+must RE-LEARN them from train at runtime (boundary scan / shallow tree / groupby = ~5
+lines). Comments must never claim work the code doesn't contain. Rank2's runtime
+derivation + train-consistency gate (already banked as a "steal this" pattern) was the
+compliant version of the exact same rule; he kept his payout. Mandatory pre-submit
+hardcode grep now in Eris solving-workflow.md.
