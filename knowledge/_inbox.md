@@ -46,3 +46,22 @@ best-of-N draw; judge attempts by design robustness (EMA, multi-representation
 ensembles, pre-declared blends), not by small public deltas. Also steal from rank2:
 runtime-verified assumptions w/ fallbacks + label-identity consistency projection
 (details in Eris exemplary-patterns.md).
+
+### [2026-07-09, Masked Structural Regime / Eris] Label-derived constants must be derived in-code - win revoked
+Context: private-1st ($250) solution REJECTED on human review; paid $18. The
+regime head (20% of score) was a pasted rule `np.select([b<0.25, b<1.5, b<3.0],
+[rg_c, rg_a, rg_d], rg_b)` mapping ANONYMIZED class codes to band intervals -
+knowable only from train labels, yet nothing in the script derived it. Aggravator:
+the comment claimed "thresholds learned from the training labels"; reviewers treat
+asserted-but-absent derivations as offline hardcoding. Other solvers derived the
+same rule from train in a few lines and passed.
+Lesson: any constant obtainable only from the labels (class<->value maps,
+thresholds, orderings) must be FIT inside solution.py (boundary scan / shallow
+tree / groupby - trivial); physics/literature constants OK with source. Never
+write a comment claiming work the code doesn't show. Mandatory pre-submit
+hardcode scan added to the Eris project workflow.
+CORRECTION to the 2026-07-09 "Best-of-N private draws" entry above: the $250
+1st place it cites was later revoked on this review; the best-of-N lesson itself
+still stands (a5 WAS the best private scorer), but the payout figure is now $18.
+Possible eris.md merge: new lesson "Reviewers judge the code as submitted -
+derive label-derived constants in-code".
