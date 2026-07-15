@@ -76,6 +76,27 @@ Improve + sync without being asked, never at the cost of curation.
 
 ---
 
+## KB Contract (retrieve + capture) - the two non-negotiables
+The KB fails in two ways; both are mechanically enforced by the `kb-guard`
+UserPromptSubmit hook (injects a reminder when the message looks like a task-start
+or carries directive language). The hook is the backstop; these rules are primary.
+
+- **RETRIEVE before you build - never let KB info sit unused.** The #1 documented
+  failure is a relevant lesson sitting in the KB while the task is re-derived from
+  scratch (Coptic char-BiLSTM, Cross-Sport - both in the KB, both skipped). Before
+  the first line of code on any task run Step 0: `rg -i '<task KIND>'` over the
+  memory index + `knowledge/INDEX.md`, name the closest PRIOR item of the same KIND
+  and its winning approach, and state which lessons bind. A KB hit outranks instinct
+  until evidence overturns it.
+- **CAPTURE the moment a durable fact appears - never make the user re-tell you.**
+  Triggers, the user: corrects you; says always / never / from now on / going
+  forward / remember / note that; states a platform rule, constraint, fact, or
+  number; reports a score or result; states a preference about how you work. On ANY
+  trigger, save it THAT TURN. Capture to `memory/` or `knowledge/_inbox.md` needs NO
+  approval (that is the frictionless lane); only PROMOTING inbox -> curated
+  `knowledge/` / `patterns/` needs approval. Deferred capture is the bug the user
+  keeps paying for; a durable fact you did not save is a defect, not a judgment call.
+
 ## Before Changing the KB (add / remove / modify)
 Auto-apply before ANY KB structural change — these hold every session:
 - **Confirm first** for `knowledge/` + `patterns/` edits (add/update/merge/
