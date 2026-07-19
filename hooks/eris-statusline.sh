@@ -21,12 +21,18 @@ fi
 [ -z "$cwd" ] && cwd="$PWD"
 clock="$(date '+%H:%M' 2>/dev/null)"
 
-# name: `.claude-session-label` line 1 (Claude writes it on "solve X"), else folder
+# name: the challenge set by the "solve X" hook, stamped with the session_id in
+# `.claude-session-label` (line 1 = name, line 2 = session_id). A label from a
+# DIFFERENT session is ignored, so a fresh / non-solving session shows "eris".
 name=""
 for f in "$cwd/.claude-session-label" "$proj/.claude-session-label"; do
-  [ -n "$f" ] && [ -s "$f" ] && { name="$(sed -n 1p "$f" 2>/dev/null)"; break; }
+  if [ -n "$f" ] && [ -s "$f" ]; then
+    lname="$(sed -n 1p "$f" 2>/dev/null)"; lsid="$(sed -n 2p "$f" 2>/dev/null)"
+    { [ -z "$lsid" ] || [ "$lsid" = "$sid" ]; } && name="$lname"
+    break
+  fi
 done
-[ -z "$name" ] && name="$(basename "$cwd")"
+[ -z "$name" ] && name="eris"
 short="$(printf '%s' "$name" | awk '{ if (NF>1) print $1" "$2; else print $1 }')"
 
 # colour: one per SESSION (hash of session_id) - stable within a session, random
