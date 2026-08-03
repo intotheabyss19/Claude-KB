@@ -25,6 +25,7 @@ if [ ! -f "$S" ] && [ -f "$HOME/.eris-pod-state" ]; then
   if [ -z "$ow" ] || [ "$ow" = "$sid" ]; then S="$HOME/.eris-pod-state"; else S=""; fi
 fi
 if [ -n "$S" ] && [ -f "$S" ]; then
-  sed -i "s/^HEARTBEAT=.*/HEARTBEAT=\"$(date +%s)\"/" "$S" 2>/dev/null
+  # -i.bak is the only in-place form both GNU and BSD sed accept
+  sed -i.bak "s/^HEARTBEAT=.*/HEARTBEAT=\"$(date +%s)\"/" "$S" 2>/dev/null && rm -f "$S.bak"
 fi
 exit 0
