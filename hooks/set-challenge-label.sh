@@ -12,6 +12,9 @@ prompt="$(printf '%s' "$payload" | jq -r '.prompt // empty' 2>/dev/null)"
 sid="$(printf '%s' "$payload" | jq -r '.session_id // empty' 2>/dev/null)"
 cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)"
 [ -z "$cwd" ] && cwd="$PWD"
+# always stamp the session id so scripts/session.sh can find this transcript
+printf '%s\n' "$sid" > "$cwd/.claude-session-id" 2>/dev/null
+
 [ -z "$prompt" ] && exit 0
 
 # capture the challenge name after a leading "solve [the] [challenge] ..."

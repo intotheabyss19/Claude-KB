@@ -32,18 +32,16 @@ fi
 [ -z "$cwd" ] && cwd="$PWD"
 clock="$(date '+%-I:%M %p' 2>/dev/null)"
 
-pick() {  # this session's file only: <base>.<sid> first, then a legacy unscoped file whose line-2 sid matches
-  local base="$1" f lsid
+pick() {  # this session's file only: <base>.<sid>, nothing else
+  local base="$1" f
   if [ -n "$sid" ]; then
     for f in "$proj/$base.$sid" "$cwd/$base.$sid"; do
       [ -n "$f" ] && [ -s "$f" ] && { printf '%s' "$f"; return 0; }
     done
   fi
-  for f in "$cwd/$base" "$proj/$base"; do          # legacy unscoped: only if it is provably ours
-    [ -n "$f" ] && [ -s "$f" ] || continue
-    lsid="$(sed -n 2p "$f" 2>/dev/null)"
-    [ -n "$lsid" ] && [ "$lsid" = "$sid" ] && { printf '%s' "$f"; return 0; }
-  done
+  # No unscoped fallback. session.sh is the ONLY writer and it always scopes by sid;
+  # the set-challenge-label hook that wrote an unscoped file was removed 2026-08-03
+  # because two writers with two layouts is how a stale name survives a session change.
   return 1
 }
 
@@ -71,34 +69,61 @@ if [ -s "$HOME/.eris-pod-state" ] && { [ -z "$powner" ] || [ -z "$sid" ] || [ "$
   [ -n "$pn" ] && pod="$(printf '%s' "${pn}${pg:+ ${pg}}" | cut -c1-26)"
 fi
 
-# --- status -----------------------------------------------------------------
-line=""; born=0
+# --- closed challenge awaiting the user's review confirmation ----------------
+# A challenge whose timer has run out pins here until the user says the review is done
+# (harvest.sh reviewed "<name>"). It only nags the session that SOLVED it - that session
+# has the context to judge its own submissions, and other sessions should not burn theirs.
+REG="${ERIS_HARVEST:-$HOME/.eris-harvest}"
+closed=""; closes=""
+if [ -d "$REG" ]; then
+  now_s=$(date +%s)
+  for hf in "$REG"/*; do
+    [ -f "$hf" ] || continue
+    NAME=""; CLOSES_AT=0; OWNER=""
+    # shellcheck disable=SC1090
+    . "$hf" 2>/dev/null
+    [ -n "$NAME" ] || continue
+    # OWNER CHECK FIRST. Anything below this line reads another session's challenge if the
+    # order is flipped - that is exactly the leak this whole rewrite exists to remove.
+    [ -n "$sid" ] && [ "$OWNER" != "$sid" ] && continue
+    if [ "${CLOSES_AT:-0}" -gt "$now_s" ]; then
+      # still open: countdown straight from the registry, so nobody opens a browser tab
+      # just to read "Closing in Xh" - that cost several round trips per challenge.
+      left=$(( CLOSES_AT - now_s )); closes="closes $(( left/3600 ))h$(( (left%3600)/60 ))m"
+      continue
+    fi
+    closed="$(printf '%s' "$NAME" | cut -c1-30)"
+    break
+  done
+fi
+
+# --- status ---------------------------------------------------------------
+# Field-based, written by session.sh as KEY=value lines. Fixed order so every session's bar
+# reads the same way: CHALLENGE - rank+public score - attempt being built - ETA - clock.
+# Deliberately absent while solving: money, gap, and the word "eris" (name covers it).
+RANK=""; WORK=""; ETA=""; ACT=""
 if sf="$(pick .claude-status)"; then
-  line="$(sed -n 1p "$sf" 2>/dev/null)"
-  born="$(sed -n 3p "$sf" 2>/dev/null)"
-elif of="$(pick .claude-objective)"; then          # legacy pin
-  line="act|$(sed -n 1p "$of" 2>/dev/null)"
-  born="$(date +%s)"
-fi
-[ -z "$born" ] && born=0
-
-out=""
-if [ -n "$line" ]; then
-  kind="${line%%|*}"; text="${line#*|}"
-  age=$(( $(date +%s) - born ))
-  case "$kind" in
-    act)
-      if [ "$age" -lt "$ACT_TTL" ]; then
-        out="$(printf '\033[1;38;5;232;48;5;220m  %s  \033[0m ' "$(printf '%s' "$text" | tr '[:lower:]' '[:upper:]')")"
-      else
-        out="$(printf '\033[2;38;5;220m %s \033[0m ' "$text")"
-      fi
-      ;;
-    info) out="$(printf '\033[38;5;42m %s \033[0m ' "$text")";;
-    *)    out="$(printf '\033[2m %s \033[0m ' "$line")";;
-  esac
+  while IFS='=' read -r k v; do
+    case "$k" in RANK) RANK="$v";; WORK) WORK="$v";; ETA) ETA="$v";; ACT) ACT="$v";; esac
+  done < "$sf"
+  if [ -z "$RANK$WORK$ETA$ACT" ]; then                      # legacy "kind|text" single line
+    legacy="$(sed -n 1p "$sf" 2>/dev/null)"
+    case "$legacy" in act\|*) ACT="${legacy#*|}";; info\|*) WORK="${legacy#*|}";; esac
+  fi
 fi
 
-printf '%s\033[1;38;5;%sm%s\033[0m' "$out" "$code" "$short"
-[ -n "$pod" ] && printf '  \033[38;5;177m(pod %s)\033[0m' "$pod"
-printf '  \033[2m%s\033[0m' "$clock"
+SEP="$(printf '\033[2m \xc2\xb7 \033[0m')"
+parts=""
+add(){ [ -n "$1" ] || return 0; [ -n "$parts" ] && parts="$parts$SEP"; parts="$parts$1"; }
+
+[ -n "$closed" ] && printf '\033[1;38;5;232;48;5;208m  CLOSED: %s - CONFIRM REVIEW  \033[0m ' "$closed"
+[ -n "$ACT" ] && printf '\033[1;38;5;232;48;5;220m  %s  \033[0m ' "$(printf '%s' "$ACT" | tr '[:lower:]' '[:upper:]')"
+
+add "$(printf '\033[1;38;5;%sm%s\033[0m' "$code" "$short")"
+[ -n "$RANK" ] && add "$(printf '\033[1;38;5;42m%s\033[0m' "$(printf '%s' "$RANK" | cut -c1-22)")"
+[ -n "$WORK" ] && add "$(printf '\033[38;5;39m%s\033[0m'  "$(printf '%s' "$WORK" | cut -c1-30)")"
+[ -n "$ETA"  ] && add "$(printf '\033[38;5;245mready %s\033[0m' "$(printf '%s' "$ETA" | cut -c1-10)")"
+[ -n "$closes" ] && add "$(printf '\033[38;5;245m%s\033[0m' "$closes")"
+[ -n "$pod"  ] && add "$(printf '\033[38;5;177m(pod %s)\033[0m' "$pod")"
+add "$(printf '\033[2m%s\033[0m' "$clock")"
+printf '%s' "$parts"
