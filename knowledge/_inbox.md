@@ -310,3 +310,174 @@ reload the module. DMI matches, `four_zoned_kb/{four_zone_mode,per_zone_mode}` a
    userspace tool exits 0 but hardware doesn't respond.
 4. Hand-built `.ko` outside DKMS (facer had a `dkms.conf` but was never registered) breaks
    on every kernel update — a recurring "this distro is broken" feeling with a config cause.
+
+---
+
+### macOS Nerd Fonts: `Mono`/`Propo` are FAMILIES, not styles (Linux→Mac migration)
+
+**Context:** Migrating a Linux terminal config (Ghostty + powerlevel10k) to macOS.
+Icons rendered as tofu boxes despite the font being installed.
+
+**Problem A — config carried over from Linux:**
+```
+font-family = "CaskaydiaCove Nerd Font"
+font-style  = Mono          # works on fontconfig, NO-OP on macOS
+```
+macOS CoreText registers three *separate families*:
+`CaskaydiaCove Nerd Font`, `... Nerd Font Mono`, `... Nerd Font Propo`.
+A `Mono` **style** never matches, so it silently falls back to a non-Nerd font —
+no error, no warning, `ghostty +validate-config` stays clean.
+
+**Fix:** name the family directly: `font-family = "CaskaydiaCove Nerd Font Mono"`.
+Verify registration with:
+`system_profiler SPFontsDataType | grep -i "family: .*<name>" | sort -u`
+
+**Problem B — installing the font ≠ the terminal using it.**
+Each terminal has its own font setting. Terminal.app's active profile
+(`defaults read com.apple.Terminal "Default Window Settings"`) was on
+`SFMonoTerminal-Regular`. Install via `brew install --cask font-caskaydia-cove-nerd-font`
+changes nothing there.
+
+**Diagnostic that pinpoints it fast:** in a broken p10k prompt, box-drawing (`─╮`) and
+dot fill (`···`) render fine while only the icons break → the font lacks the Nerd Font
+**PUA range** (U+E000–F8FF), it is not a general encoding/locale problem.
+
+**Don't script Terminal.app's font:** it lives as an `NSKeyedArchiver` blob under
+`Window Settings → <profile> → Font`, and Terminal rewrites its entire plist on quit —
+a live `defaults write` gets clobbered. Use the GUI, or edit only while Terminal is quit.
+Decode to inspect: `plistlib.loads(prof['Font'])['$objects']`.
+
+---
+
+### VLC skins are not supported on macOS at all (Linux→Mac migration)
+
+**Context:** Dropped a `.vlt` skin into `~/.local/share/vlc/skins2/` per a skins site's
+instructions; nothing changed, and there was no Tools or settings menu to select a skin.
+
+**Problem:** The **skins2 interface module is never built for macOS.** Verified on VLC
+3.0.23 — 340 plugins ship, and the only interface modules are `libmacosx_plugin.dylib`
+(native Cocoa) and `libncurses_plugin.dylib`. No `libskins2_plugin.dylib` exists:
+```sh
+find /Applications/VLC.app/Contents -iname "*skins*"   # returns nothing
+```
+Two compounding traps: (1) `~/.local/share/vlc/` is the *Linux* config path — macOS VLC
+uses `~/Library/Application Support/org.videolan.vlc/`; (2) the missing "Tools" menu is
+not a bug — that's the **Qt** interface's menu layout. macOS uses a native Cocoa menu bar
+where preferences live under `VLC → Settings` (`⌘,`). Skin sites rarely state the platform
+limitation.
+
+**Fix:** Use VLC's own dark interface style instead — a real, separate option:
+```
+--macosx-interfacestyle    "Run VLC with dark interface style"  (default: disabled)
+```
+GUI: `⌘,` → Interface → Appearance. Restart VLC to apply.
+
+**Gotcha:** it does **not** follow the system appearance on 3.0.x — the system can be in
+Dark mode while VLC stays light, which is exactly what makes it look broken. Also don't
+`defaults write org.videolan.vlc` while VLC is running; like Terminal.app it rewrites its
+plist on quit and clobbers the change.
+
+**Generalisation (2 for 2 this migration):** a Linux-era config path or option carried to
+macOS tends to **silently no-op** rather than error. Before debugging *why* a setting had
+no effect, first verify the mechanism exists on macOS at all.
+
+---
+
+### Homebrew cask adoption: batch is all-or-nothing, MAS apps are off-limits, App Management blocks chmod
+
+**Context:** Adopting 8 already-installed macOS apps into Homebrew with
+`brew install --cask --adopt <a> <b> …` so they'd be Brewfile-tracked and `--zap`-removable.
+
+**Problem 1 — a batch cask install is all-or-nothing.** Brew fetches *every* cask before
+installing *any*. Six of eight downloads failed on a flaky connection, so the two that
+downloaded fine were never installed either; `brew list --cask` was unchanged. Exit 1, zero
+progress.
+**Fix:** loop one cask at a time so each success commits independently:
+```sh
+for c in ghostty vlc obsidian; do brew install --cask --adopt "$c" || echo "FAILED: $c"; done
+```
+Partial downloads persist in `~/Library/Caches/Homebrew/downloads` as `*.incomplete` and
+**resume** on retry — a failed run isn't wasted bandwidth.
+
+**Problem 2 — `--adopt` still downloads the full artifact.** Even though all 8 apps were
+already in `/Applications`, brew fetched every DMG to verify the installed bundle matches the
+cask before claiming it. Adopting costs the same bandwidth as installing fresh.
+
+**Problem 3 — Mac App Store apps cannot be adopted.** Symptom is a sudo prompt:
+```
+Failure while executing; `/usr/bin/sudo -E -- chmod -R a+rX /Applications/WhatsApp.app` exited with 1
+```
+Detect before trying: `[ -e "/Applications/<App>.app/Contents/_MASReceipt" ]`, or
+`/bin/ls -ld` showing `root wheel`. MAS bundles are root-owned and sealed; supplying the
+password doesn't help. The App Store is already their update/uninstall channel — leave them
+unmanaged. This is a legitimate permanent exception to "install everything via brew".
+
+**Problem 4 — `chmod: Operation not permitted` on a bundle you own.**
+```
+drwxr-xr-x yash admin  /Applications/Obsidian.app        # owned by the user
+-rwx------ yash admin  …/app.asar.unpacked/…/index.js    # mode 0700, needs a+rX
+```
+Not a POSIX problem — **macOS App Management (TCC, macOS 13+)** blocks any process from
+modifying another app's bundle regardless of ownership. `chmod` fails despite `yash` owning
+the file.
+**Fix:** System Settings → Privacy & Security → **App Management** → enable the terminal
+(Ghostty). Note this is a broad grant: anything run in that terminal may then modify installed
+apps. Declining just leaves that app unmanaged.
+**Why only some casks hit it:** casks whose files already satisfy `a+rX` make the chmod a
+no-op and pass; only a bundle with a genuinely non-conforming mode triggers the block. So the
+failure looks arbitrary across a batch when it isn't.
+
+**Cross-ref:** third TCC surprise of this migration, after the removable-volume grant (only
+Ghostty held it) and the Terminal.app plist-rewrite-on-quit trap. On macOS, **POSIX
+permissions are necessary but not sufficient** — TCC sits above them and fails with ordinary
+errno values that read like permission bugs.
+
+### Android USB tethering does not work on macOS at all (Linux→Mac migration)
+
+**Context:** MacBook Air, macOS 26.5.1, Samsung Android phone, USB-C to USB-C.
+Tethering worked on Arch; on macOS nothing appears in Network settings. First
+suspicion was the macOS firewall.
+
+**Problem:** Android USB tethering speaks **RNDIS** (Microsoft Remote NDIS).
+Windows and Linux ship RNDIS drivers; **macOS never has**. macOS supports only
+CDC-ECM and CDC-NCM. The phone enumerates on USB, no driver matches, no network
+interface is created, and there is nothing in System Settings to configure — a
+**silent no-op**, not an error.
+
+The macOS Application Firewall is *not* involved: it only blocks incoming
+connections to listening services and cannot prevent interface creation. Ruling
+it out is free.
+
+**Fix / diagnosis:** two commands separate "device not seen" from "seen but no
+driver":
+```sh
+ioreg -p IOUSB -w0 -l | grep -iE '"USB (Product|Vendor) Name"|idProduct|idVendor'
+networksetup -listnetworkserviceorder
+```
+Device present in `ioreg` + absent from the service list = driver gap, and it
+also **proves the cable is data-capable** (charge-only C-C cables don't
+enumerate), which rules out the most common false lead in one step.
+
+Beware `en2`/`en3` "Ethernet Adapter" red herrings — on Apple Silicon these pair
+with `anpi0/anpi1` (`AppleUSBDeviceNCMPrivateEthernetInterface`), are Apple
+*internal*, and sit at `media: none, status: inactive` regardless of what's
+plugged in.
+
+Real options: Wi-Fi hotspot (native, faster than USB anyway — plug the cable in
+alongside just for charging); check Android Developer Options for a **CDC-NCM**
+tethering toggle (newer One UI builds; macOS binds it with zero drivers);
+Bluetooth PAN (native, ~1–3 Mbps). **HoRNDIS** is dead (unsigned kext, no Apple
+Silicon, needs SIP disabled). **ReRNDIS** (JellyBrick, GPL-3.0) is the userspace
+successor and needs no SIP change, but as of 2026-08-06 it was created 6 days
+prior with one release and 0 stars — too immature to route all traffic through.
+
+**Generalises:** second instance of the same migration failure mode — *a
+Linux-era config path, option, or protocol carried to macOS tends to silently
+no-op rather than error.* When a Linux habit "does nothing" on macOS, check for
+an absent driver/module before assuming a setting is hidden. See also the VLC
+skins2 lesson.
+
+**Adjacent, same session:** macOS has **no built-in per-app lock** — Touch-ID
+app locking is third-party only. Vet by repo/vendor maintenance, and treat all
+such tools as privacy curtains, not security boundaries (Terminal stays
+reachable by design, so the daemon can always be killed).
