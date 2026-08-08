@@ -481,3 +481,77 @@ skins2 lesson.
 app locking is third-party only. Vet by repo/vendor maintenance, and treat all
 such tools as privacy curtains, not security boundaries (Terminal stays
 reachable by design, so the daemon can always be killed).
+
+### exFAT cluster slack makes small-file trees ~6x larger on a flashdrive
+*Captured 2026-08-08, macOS→Linux migration drive.*
+
+**Context:** staging trees onto an exFAT flashdrive for a machine migration; `df`
+showed 85G used on a 115G stick while `du -sh` over every visible dir summed to 55G.
+
+**Problem:** exFAT formats large volumes with 128 KiB clusters. Every file, however
+small, consumes a full cluster. An `imagehtr/` tree of 115,361 mostly-tiny files held
+466 M of real data but occupied **3.0 G** on the drive. Budgeting capacity from real
+data size overruns the drive at roughly a third of nominal capacity, and the
+`df`-vs-`du` gap looks like phantom/hidden data (it is not — check `.Trashes` to rule
+that out, then stop hunting).
+
+**Fix:** `tar -czf` small-file trees before writing them to exFAT; copy only large
+files loose. When auditing a drive, compare `df` to `du` early and attribute the gap to
+slack rather than chasing it. Verify copies by content (`rsync -rcn --itemize-changes`
+or a `sha256sum` manifest) — never by size, since apparent size differs per filesystem.
+
+### ReRNDIS on macOS: it works — plus the IOKit user-client level trap
+
+**Context:** follow-up to the Android-USB-tethering lesson above. Galaxy M35 5G
+(One UI 8.5) + MacBook Air, macOS 26.5.1. ReRNDIS built from source and
+installed as a root LaunchDaemon. Outcome: **it works** — real DHCP lease,
+`reconciler: tether service is primary`, MBs transferred. The earlier
+"too immature, don't run it" call was overturned by evidence.
+
+**Problem 1 — the wrong inference (the actually valuable bit).** `ioreg` showed
+`Brave Browser <AppleUSBHostDeviceUserClient>` attached to the phone, and
+sessions were dying with `kIOReturnNotResponding` (0xe00002ed) on bulk-in. I
+concluded Brave was stealing the endpoints. **Wrong.** IOKit user clients attach
+at different *levels* of the tree:
+- `AppleUSBHostDeviceUserClient` — device level (what a browser's WebUSB grant creates)
+- `AppleUSBHostFrameworkInterfaceClient` — interface level (what a driver creates)
+
+Both coexist on the same device simultaneously with no contention. Proof: with
+Brave reopened and holding its device-level client, ReRNDIS held interface-level
+clients on *both* RNDIS interfaces and pushed 3.7 MB. A browser attached to a USB
+device is **not** evidence it is blocking a driver — check which level the
+clients sit at before blaming one.
+
+**Problem 2 — sessions drop, and only a HOST-end replug recovers them.** Sessions
+die with `kIOReturnNotResponding` at irregular intervals (3m08s, 6m27s, sometimes
+instantly). Unplugging at the *phone* end or toggling tethering does not reliably
+recover; **unplugging at the Mac end does**, because it forces host-side USB
+re-enumeration and clears stale endpoint state. Also: the first attach after a
+drop frequently dies in its own second; the second attach succeeds. ReRNDIS does
+not re-enumerate on bulk-in abort, so recovery is manual.
+
+**Problem 3 — no menu-bar/Network-panel indicator, and that is correct.** ReRNDIS
+never creates a macOS *network service*; it makes a `feth` pair and writes the
+default route + `State:/Network/Global/DNS` directly via SCDynamicStore. Traffic
+flows with nothing to show in System Settings. Absence of an indicator is the
+design, not a fault. Corollary: `networksetup -listnetworkserviceorder` will
+never list it.
+
+**Fix / techniques worth reusing:**
+- Decode IOKit errors from the SDK header, never memory:
+  `grep -rh "0x2ed" /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/`
+  → `kIOReturnNotResponding`.
+- Prove which interface carried traffic without disturbing Wi-Fi:
+  `curl -s --interface feth0 -w "%{http_code} %{time_connect}" https://...`
+- Check for the stranded-route failure mode after any teardown:
+  `netstat -rn -f inet | head`, `scutil <<< "show State:/Network/Global/DNS"` —
+  if `__IF_INDEX__` and `__CONFIGURATION_ID__` match the live Wi-Fi service, it's
+  configd's own record, not a leftover manual override.
+- `swift test` needs full Xcode (`Testing` module); Command Line Tools alone
+  builds fine but cannot run swift-testing suites. Say so rather than implying
+  tests passed.
+
+**Patch applied locally** (`~/Projects/PersonalProjects/rerndis`, commit on top of
+upstream): `DeviceMatching.swift:85` `candidate.number == interface.number + 1`
+traps on `UInt8` 255 → promoted both sides to `Int`. Verified equivalent over all
+65536 pairs. Worth reporting upstream along with the missing re-enumerate-on-abort.
