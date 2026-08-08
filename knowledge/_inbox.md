@@ -555,3 +555,44 @@ never list it.
 upstream): `DeviceMatching.swift:85` `candidate.number == interface.number + 1`
 traps on `UInt8` 255 → promoted both sides to `Int`. Verified equivalent over all
 65536 pairs. Worth reporting upstream along with the missing re-enumerate-on-abort.
+
+### ReRNDIS tuning on Samsung RNDIS — and: measure the baseline BEFORE optimising
+
+**Context:** continuing the ReRNDIS lesson above. Galaxy M35 5G + MacBook Air.
+Sessions were dropping every few minutes; separately, downloads looked slow.
+
+**Problem 1 — sessions died every few minutes.** `torn down (bulk-in ended:
+IOReturn 0xe00002ed / kIOReturnNotResponding)` at 3m08s, 6m27s, ~8m, sometimes
+instantly. Cause: ReRNDIS's default **`txMode pipelined`** is unstable on this
+device.
+
+**Fix:** `rerndisctl config --tx-mode ordered`. Result: **19m31s with zero
+teardowns through 217 MB**, and it survived a deliberate `rerndisctl bench`
+saturation. Modes are `ordered | balanced | pipelined | throughput`; the default
+is not the safe one. Suspect this is worth an upstream report.
+
+**Problem 2 — `rxReaders` is NOT a throughput lever.** Reasoned that with
+`rxReaders 1` only one bulk-IN transfer is in flight, so throughput =
+`maxTransfer / turnaround` = latency-bound. The arithmetic agreed suspiciously
+well (predicted 8.4 Mbps @4.5ms; measured 8.5 via 4-stream download, 9.7 peak
+over 20 min). **The model was wrong anyway** — raising 1 → 8 readers gave only
+**1.26x** (8.5 → 10.7 Mbps), not 8x. Three numbers agreeing did not make the
+explanation correct; they agreed because they were all measuring the same
+*external* cap.
+
+**Problem 3 — the actual mistake: three rounds of tuning with no baseline.** The
+real limit was the cellular link (5–50 Mbps typical for this user, less at the
+time). The tether was already delivering ~100% of available bandwidth. The
+missing measurement was trivial and was never taken: **run a speed test on the
+phone itself.**
+
+**Rule:** before tuning any transport, measure the endpoint you do not control.
+A flat result across several very different configurations (8.5 / 9.7 / 10.7
+Mbps here) is the signature of an external cap — stop turning knobs and go find
+the ceiling.
+
+**Useful:** `rerndisctl bench` measures the **USB TX limit locally with zero
+mobile data** — 30.8 MB/s (246 Mbps), p50 RTT 1.7 ms. Establishes the cable is
+not the constraint before spending data on real transfers. Note it only exercises
+TX; the failures here were all on bulk-**IN**, so bench surviving is weaker
+evidence than it appears.
