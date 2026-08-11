@@ -596,3 +596,6 @@ mobile data** — 30.8 MB/s (246 Mbps), p50 RTT 1.7 ms. Establishes the cable is
 not the constraint before spending data on real transfers. Note it only exercises
 TX; the failures here were all on bulk-**IN**, so bench surviving is weaker
 evidence than it appears.
+
+### Explicit document identifiers in challenge prompts are search shortcuts (Seal India, 2026-08-12)
+Built 3 multi-hop India-travel questions (all passed adversarial link/uniqueness verification), then blind-probed each with a Claude agent given only the prompt: all 3 SOLVED with high confidence. Common factor: prompts embedded verbatim identifiers (F.No./LOA ref numbers, "Table 5.2.2", exact list titles) — each is a googleable string that collapses the discovery hops; probe went straight to the PDFs. Scanned/rotated/no-text-layer PDFs did NOT stop the probe (rendered pages to images). Candidate fix: keep edition/date locks (required for timelessness) but describe documents indirectly instead of quoting their reference numbers/table numbers; difficulty must come from unindexed discovery, not from reading obscure formats. Extends knowledge/model-challenge-design.md (proxy-validation lesson held: caught all 3 before an expensive submission).
