@@ -609,3 +609,6 @@ Fix: Sophos/Cyberoam portals (port 8090, images/logo-sophos.png in page CSS) acc
 No session/cookie/browser needed. Automate via LaunchAgent WatchPaths on /private/var/run/resolv.conf
 (fires on any network change) + creds from Keychain (`security find-generic-password -s SVC` — parse
 `"acct"` line for username, `-w` for password). Check captive.apple.com for "Success" to skip when online.
+Hardening (from script review): feed password via `--data-urlencode "password@-"` + `printf | curl`
+(never argv — visible in `ps`; printf not herestring, `<<<` adds newline). Fingerprint the portal page
+(`logo-sophos` marker) before POSTing — RFC1918 gateway IPs recur on foreign networks, blind POST = cred exfil.
