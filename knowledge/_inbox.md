@@ -599,3 +599,13 @@ evidence than it appears.
 
 ### Explicit document identifiers in challenge prompts are search shortcuts (Seal India, 2026-08-12)
 Built 3 multi-hop India-travel questions (all passed adversarial link/uniqueness verification), then blind-probed each with a Claude agent given only the prompt: all 3 SOLVED with high confidence. Common factor: prompts embedded verbatim identifiers (F.No./LOA ref numbers, "Table 5.2.2", exact list titles) — each is a googleable string that collapses the discovery hops; probe went straight to the PDFs. Scanned/rotated/no-text-layer PDFs did NOT stop the probe (rendered pages to images). Candidate fix: keep edition/date locks (required for timelessness) but describe documents indirectly instead of quoting their reference numbers/table numbers; difficulty must come from unindexed discovery, not from reading obscure formats. Extends knowledge/model-challenge-design.md (proxy-validation lesson held: caught all 3 before an expensive submission).
+
+### Sophos captive portal: curl login beats browser automation (2026-08-13)
+Context: college wifi (NIT Sikkim) captive portal on 10.100.20.1:8090, macOS CNA popup breaks autofill.
+Problem: assumed browser automation needed for captive-portal login; portal page is JS-driven with no <form action>.
+Fix: Sophos/Cyberoam portals (port 8090, images/logo-sophos.png in page CSS) accept plain
+`POST /login.xml` with `mode=191&username&password&a=<ms-timestamp>&producttype=0`
+(Content-Type x-www-form-urlencoded). Success = `<![CDATA[LIVE]]>` in XML response; logout = mode=193.
+No session/cookie/browser needed. Automate via LaunchAgent WatchPaths on /private/var/run/resolv.conf
+(fires on any network change) + creds from Keychain (`security find-generic-password -s SVC` — parse
+`"acct"` line for username, `-w` for password). Check captive.apple.com for "Success" to skip when online.
