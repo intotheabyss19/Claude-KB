@@ -612,3 +612,37 @@ No session/cookie/browser needed. Automate via LaunchAgent WatchPaths on /privat
 Hardening (from script review): feed password via `--data-urlencode "password@-"` + `printf | curl`
 (never argv — visible in `ps`; printf not herestring, `<<<` adds newline). Fingerprint the portal page
 (`logo-sophos` marker) before POSTing — RFC1918 gateway IPs recur on foreign networks, blind POST = cred exfil.
+
+### A Hyper key that includes Shift silently kills every SUPER+SHIFT binding
+
+**Context:** Porting a Hyprland/kanata keyboard layout to macOS. Caps Lock was mapped
+(Karabiner) to the conventional Hyper = `⌘⌃⌥⇧` on hold, Escape on tap. Next step was
+i3-style tiling binds in AeroSpace: `SUPER+hjkl` focus, `SUPER+SHIFT+hjkl` move.
+
+**Problem:** `Hyper+Shift+H` is physically indistinguishable from `Hyper+H`. Hyper already
+holds Shift down, so pressing the physical Shift key changes nothing in the event stream —
+hotkey APIs (Carbon `RegisterEventHotKey`, `NSEvent.modifierFlags`) report a single `shift`
+flag with no left/right or press-count distinction. Half of an i3-style keymap — every
+"move window" and "send to workspace" bind — cannot be expressed. This is silent: the
+config parses fine and the second binding just never fires, or shadows the first.
+
+**Fix:** define the Caps-hold modifier WITHOUT Shift — `⌘⌃⌥` — and keep Shift as a free
+modifier on top. `cmd-ctrl-alt-h` = focus, `cmd-ctrl-alt-shift-h` = move, exactly mirroring
+`SUPER` / `SUPER+SHIFT`. The same reasoning applies to any layered modifier: a base
+modifier must exclude any modifier you intend to combine with it. Reserve the full
+four-modifier Hyper for flat, one-key-per-action launcher binds where nothing is layered
+on top. Cost of ⌘⌃⌥ vs ⌘⌃⌥⇧ is a slightly higher chance of colliding with an app shortcut;
+in practice ⌘⌃⌥+letter is nearly unused.
+
+**Catch it early:** the moment a plan pairs "Hyper key" with "MOD+SHIFT" bindings, the
+design is already broken — check the modifier composition before writing any config.
+
+### Persist hard-problem attempts before session end (2026-08-14)
+Context: multi-session Codeforces hard problem; session 2 asked "how close did
+attempt 1 get" — unanswerable. Attempt code lived only in chat/scratchpad;
+scratchpad is session-scoped, context summary dropped the code, memory/ empty.
+Problem: long-horizon problem attempts evaporate between sessions; user can't
+audit progress, next session re-derives from zero.
+Fix: on any hard problem spanning sessions, write attempt .cpp + 5-line status
+note (approach, what passed/failed, next idea) into the PROJECT repo (or
+memory/) before the session ends. Chat context is not storage.
