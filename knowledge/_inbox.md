@@ -646,3 +646,25 @@ audit progress, next session re-derives from zero.
 Fix: on any hard problem spanning sessions, write attempt .cpp + 5-line status
 note (approach, what passed/failed, next idea) into the PROJECT repo (or
 memory/) before the session ends. Chat context is not storage.
+
+### Fable-5-class at xhigh defuses methodology-trap ML challenges cold (2026-08-14)
+Context: Eris challenge built per model-challenge-design.md (Opus-4.x-era
+calibration): snapshot leakage, contaminated aggregate, regime shift +
+worst-slice grading, decision-layer metric. Measured bands: naive 0.02,
+careful-no-tilt 0.32, designer fair-path 0.89, oracle 1.0. One cold Fable 5
+proxy (xhigh, no KB, no feedback, 17 min) scored 0.9185/0.9195/0.9276 —
+above the designer reference. It found every trap EMPIRICALLY (drift check
+caught degenerate [W] fields; recomputed the contaminated provider rate from
+train labels to diagnose fresh-vs-frozen semantics, then rebuilt the feature
+snapshot-consistent — beyond the reference solution), used temporal +
+patient-grouped CV, derived the exact 4q/(1+3q) tilt + EV flag rule, and did
+minimax reasoning on the grader's worst-segment normalization.
+Problem: methodology traps (leakage/validation/metric/shift) no longer stump
+frontier-2026 models on clean tabular tasks, even undisclosed — the KB's
+"cold methodology errors" lever is dead at this model tier; disclosure
+prominence knobs are irrelevant when the agent runs drift checks unprompted.
+Fix: for Fable-class targets, difficulty must come from edge-of-feasibility
+(compute/budget-starved) or genuinely obscure domains, not traps. Traps still
+discriminate MODEL TIER and rigor (keep for rubric value). And the proxy-run
+protocol is what caught this pre-ship — never skip it. See [[eris]],
+model-challenge-design.md.
