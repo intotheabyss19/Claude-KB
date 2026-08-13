@@ -668,3 +668,33 @@ Fix: for Fable-class targets, difficulty must come from edge-of-feasibility
 discriminate MODEL TIER and rigor (keep for rubric value). And the proxy-run
 protocol is what caught this pre-ship — never skip it. See [[eris]],
 model-challenge-design.md.
+
+### Heterogeneous-effect (uplift) estimation is the trap that survives frontier rigor (2026-08-14)
+Context: challenge v2 re-test after Fable-5-xhigh defused all v1 methodology
+traps. v2 added: counterfactual flag scoring (visit uplift anti-correlated
+with risk), vitals waveforms (signal in structure not global stats), hidden
+worst-band term. Cold solver scored 0.6414/0.6663/0.8478 (oracle 1.0).
+Problem: it again defused leakage/validation/representation levers cold
+(struct-tier waveform features, pilot rows excluded from risk training,
+family-diverse ensemble that stabilized worst-segment mins). The ONE lever
+that landed: it measured the pilot's AVERAGE effect (r=0.81 multiplier) and
+assumed homogeneity - flags ranked by risk-with-constant-effect, 24% overlap
+with the uplift-optimal set, -0.084 leaderboard left on the table vs oracle
+flags on its own predictions.
+Fix: for frontier-model challenge difficulty, put the score weight on
+heterogeneous causal-effect estimation under a modest pilot (identification +
+per-row tau, not ATE). Correlational rigor is saturated; causal targeting is
+not (yet). See [[eris]], model-challenge-design.md.
+
+### Designer reference is a lower bound, never the ceiling - calibrate vs a frontier proxy (2026-08-14)
+Context: both v1 and v2 pre-registered difficulty bands from MY reference
+pipelines (0.02-0.32, then 0.50-0.57); cold Fable scored 0.93 then 0.85 -
+above the designer reference BOTH times (better calibration, ensemble
+stabilization of worst-segment min terms, snapshot-consistent features).
+Problem: setting "steered band"/gap targets from the designer solution
+systematically understates the achievable score; every difficulty conclusion
+drawn from it is wrong in the same direction.
+Fix: the reference solution proves feasibility only. Difficulty bands and
+gap targets must be calibrated against a frontier-proxy run (same model
+class as the graded population), and the proxy's score becomes the working
+ceiling estimate. Never predict from your own pipeline twice.
