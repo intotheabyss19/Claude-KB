@@ -58,7 +58,7 @@ When user says "promote this to global" or "move to global KB":
 
 1. Read the local lesson
 2. Identify the right global domain file in
-   `/home/ysh/Desktop/Obsidian/Prompts/Claude/knowledge/`
+   `/Users/yash/Desktop/Obsidian/Prompts/Claude/knowledge/`
 3. Propose the addition (generalize project-specific details if needed)
 4. On approval: add to global `knowledge/<domain>.md`, update
    `knowledge/INDEX.md` if new domain file was created

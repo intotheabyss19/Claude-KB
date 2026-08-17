@@ -115,7 +115,7 @@ Context: any plan to speed CPU transformer inference via ONNX Runtime or HF Opti
 Technique: packages.md has ONLY `onnx` (the exporter/IR), NOT `onnxruntime`, `optimum`, `openvino`, or `intel-extension-for-pytorch`. `mkl` + `intel-openmp` ARE present. So you can EXPORT an ONNX graph but cannot RUN it, and runtime `pip install onnxruntime` is a hard rejection. Every blog showing "6x CPU speedup with ORT int8" is unusable here - use the pure-PyTorch path (`torch.quantization.quantize_dynamic` + `torch.set_num_threads`). VERIFY every inference-accel lib against packages.md before building around it.
 Why/when it wins vs fails: reviewers reject non-packages.md imports regardless of score; discovering this at submission burns a credit. The mistake is copying an ORT recipe because it has the best published numbers.
 CPU cost: n/a - an availability gate.
-Source: /home/ysh/Projects/Eris/packages.md (only `onnx` present) ; https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7
+Source: /Users/yash/Projects/Eris/packages.md (only `onnx` present) ; https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7
 
 ### PyTorch dynamic int8 quantization: the available CPU transformer speedup, but ~1.8x (Linear-only), not the 4-6x ORT/VNNI blogs cite
 Context: forward-passing a DistilBERT/MiniLM/ChemBERTa-scale model over N-thousand samples in 1.5h on CPU, onnxruntime unavailable.

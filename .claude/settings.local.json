@@ -3,7 +3,7 @@
     "allow": [
       "Bash(git init *)",
       "Bash(git add *)",
-      "Read(//home/ysh/.claude/skills/**)",
+      "Read(//Users/yash/.claude/skills/**)",
       "Bash(node -e \"const {compress}=require\\('./skills/compress/prose-compressor'\\); console.log\\(compress\\('The function is basically just really simple.'\\)\\);\")",
       "Bash(git config *)",
       "Bash(git ls-remote *)",

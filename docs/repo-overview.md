@@ -1,26 +1,15 @@
 # Repo Overview
 
-Personal Claude Code KB at `/home/ysh/Desktop/Obsidian/Prompts/Claude/`:
+Personal Claude Code KB at `/Users/yash/Desktop/Obsidian/Prompts/Claude/`:
 lessons, patterns, and skills that compound over time.
 
 ## Structure
-```
-Claude/
-├── CLAUDE.md     — entry point; @imports the always-loaded docs
-├── docs/         — working-rules.md + skill-routing.md + repo-overview.md are
-│                   always loaded; knowledge-architecture.md + project-lifecycle.md
-│                   load on demand via INDEX
-├── skills/       — custom skills + REGISTRY.md (active/dormant set + budget ledger)
-├── vendor/       — third-party skills: scientific-agent-skills (submodule);
-│                   agent-verifier, agent-skills, anthropics-skills, skills-catalog
-│                   (plain copies). Provenance + security review in each
-│                   <pack>/PROVENANCE.md
-├── patterns/     — reusable design how-to (rare writes)
-├── knowledge/    — task-specific lessons; INDEX.md = keyword map; _inbox.md =
-│                   append-only capture lane
-├── hooks/        — kb-autopush.sh (auto-sync Stop-hook)
-└── setup.sh      — installer for sharing the KB
-```
+
+`ls` the repo for the layout. What it does not show: `docs/` splits into always-loaded
+(working-rules, skill-routing, repo-overview) and INDEX-routed on-demand
+(knowledge-architecture, project-lifecycle); `vendor/` holds third-party skills with provenance
+and security review in each `<pack>/PROVENANCE.md`; `knowledge/_inbox.md` is the append-only
+capture lane, `patterns/` is rare-write.
 
 ## Distribution & activation
 - Source of truth is this repo. `CLAUDE.md` + each ACTIVE skill folder are

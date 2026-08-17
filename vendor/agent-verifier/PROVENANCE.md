@@ -23,7 +23,7 @@ Dormant skills cost **zero tokens** until symlinked. Activate one with:
 
 ```sh
 for cfg in ~/.claude-personal ~/.claude-work; do
-  ln -sfn /home/ysh/Desktop/Obsidian/Prompts/Claude/vendor/agent-verifier/skills/<name> "$cfg/skills/<name>"
+  ln -sfn /Users/yash/Desktop/Obsidian/Prompts/Claude/vendor/agent-verifier/skills/<name> "$cfg/skills/<name>"
 done
 ```
 

@@ -60,8 +60,8 @@ Use when: a competition/benchmark/client task is complex, the domain is unfamili
 1. **`deep-research`** — find SOTA, standard benchmarks, leakage traps, and the canonical metric for THIS domain before inventing one. Adapt the field's known-good recipe. **Trust but verify:** run the researched recipe through the §1 leakage/contamination check too — published pipelines leak.
 2. **Activate a dormant scientific skill.** The library at `vendor/scientific-agent-skills/skills/` holds **147** domain skills costing 0 tokens until symlinked. Tell the user to symlink the match into BOTH config dirs, then **deactivate after the task** to reclaim the shared ~8k-char description budget:
    ```
-   ln -sfn /home/ysh/Desktop/Obsidian/Prompts/Claude/vendor/scientific-agent-skills/skills/<name> ~/.claude-work/skills/<name>
-   ln -sfn /home/ysh/Desktop/Obsidian/Prompts/Claude/vendor/scientific-agent-skills/skills/<name> ~/.claude-personal/skills/<name>
+   ln -sfn /Users/yash/Desktop/Obsidian/Prompts/Claude/vendor/scientific-agent-skills/skills/<name> ~/.claude-work/skills/<name>
+   ln -sfn /Users/yash/Desktop/Obsidian/Prompts/Claude/vendor/scientific-agent-skills/skills/<name> ~/.claude-personal/skills/<name>
    ```
    Routing map (all names verified present):
    - **Single-cell / omics:** scanpy, anndata, scvi-tools, scvelo, cellxgene-census, pydeseq2, bulk-rnaseq, pathway-enrichment. Batch correction = Harmony/Combat/scVI integration, not just "detect."
