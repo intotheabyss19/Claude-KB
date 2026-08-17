@@ -719,3 +719,37 @@ invite worked first try, the other failed 2x then worked. Check
 scopes; `gh api users/<handle>` also confirms a handle is real vs a bad username, since
 the outage returns 503 where a typo would return 404. Git operations over SSH stayed up
 throughout.
+
+### Never use an unvalidated `gh` capture as a filename — 503 bodies go to stdout (2026-08-17)
+Context: built git-as-message-bus for 3 Claude sessions sharing a repo; resolved the
+author's handle with `h="$(gh api user --jq .login 2>/dev/null)"; [ -n "$h" ] && use "$h"`.
+Problem: during a GitHub API outage `gh` writes its error JSON to **stdout**, not stderr,
+and the assignment-then-test idiom discards the exit code — so `{"message": "No server is
+currently available..."}` became the handle. It was then interpolated into a path, producing
+`chat/{"message": ...}\r.md`: a committed filename containing quotes AND a carriage return,
+which cannot be checked out on Windows. Pushed before anyone noticed.
+Fix: two rules. (1) Capture exit code, not emptiness — `if h="$(cmd)"; then` — and (2) still
+validate the shape before use: `[[ "$h" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ ]]` for a GitHub
+handle. Emptiness is never a sufficient success test for a network CLI. Any value that
+becomes a *path* needs a whitelist regex, never a blacklist. Drop such a commit with
+`git push --force-with-lease` rather than reverting — a revert leaves the toxic name in
+history forever. `--force-with-lease` is also the variant the auto-mode classifier blocks,
+so hand it to the user with `!`.
+Also: bound network calls in a SessionStart hook with `GIT_SSH_COMMAND="ssh -o
+ConnectTimeout=10 -o BatchMode=yes"` + `GIT_TERMINAL_PROMPT=0`, not a watchdog subshell —
+the watchdog works but its reaping prints "Terminated: 15" into the user's terminal.
+And copy-on-select ("highlight to copy, no Ctrl+C") is a TERMINAL setting, not a Claude Code
+one: Ghostty and WezTerm default to it, iTerm2 needs Settings > General > Selection,
+Terminal.app can't. A repo can't ship it; don't promise it in a setup script.
+
+### Repo-carried protocol beats a polling daemon for multi-session collaboration (2026-08-17)
+Context: user wanted three Claude Code sessions on three machines to converse; asked whether
+they could all poll GitHub and pull changes.
+Problem: sessions are turn-driven — a hook can inject context but cannot make an idle session
+wake and reply, so a poller buys little over a pull. And building on the Issues API is fragile:
+during this outage `gh` 503'd for hours while git-over-SSH never dropped.
+Fix: put the protocol in the repo's `CLAUDE.md` so **pulling is the onboarding** — the other
+session reads how to talk back without being told. Messages as commits, one append-only file
+per author (single-writer ⇒ pulls never conflict), a `SessionStart` hook to surface unread,
+and a checked-in `setup.sh` for machine config. Note project-settings hooks need each person
+to approve the folder, so the manual path must always work too.
