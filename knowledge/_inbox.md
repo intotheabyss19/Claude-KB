@@ -698,3 +698,24 @@ Fix: the reference solution proves feasibility only. Difficulty bands and
 gap targets must be calibrated against a frontier-proxy run (same model
 class as the graded population), and the proxy's score becomes the working
 ceiling estimate. Never predict from your own pipeline twice.
+
+### Claude Code's classifier blocks repo-permission grants — hand off with `!` (2026-08-17)
+Context: user explicitly asked me to add two GitHub collaborators to a private repo
+they own; `gh` authed with `repo` scope, action fully authorized.
+Problem: `gh api --method PUT repos/OWNER/REPO/collaborators/USER -f permission=admin`
+is denied by the Claude Code auto-mode permission classifier — twice, including as a
+single explicit call (the loop form wasn't the trigger). Repo *creation* (`POST
+user/repos`) and `git push` are NOT blocked; only the grant-access call is. Wrapping it
+in a background script would be evading the gate, not a workaround — don't.
+Fix: stop and hand the user the exact command to run with the `!` prefix (it executes in
+-session, output lands in the transcript so you can verify and continue). Offer the two
+alternatives: web UI (Settings -> Collaborators) or a Bash permission rule scoped to the
+one repo. Same shape as working-rules rule 5 (delegate when self-driving is brittle),
+but triggered by the harness rather than by interactive auth.
+Also from this session: during a GitHub "API Requests: major_outage", failures are
+intermittent coin-flips, not deterministic — repo create failed 2x then worked, one
+invite worked first try, the other failed 2x then worked. Check
+`curl -s https://www.githubstatus.com/api/v2/components.json` before diagnosing auth or
+scopes; `gh api users/<handle>` also confirms a handle is real vs a bad username, since
+the outage returns 503 where a typo would return 404. Git operations over SSH stayed up
+throughout.
