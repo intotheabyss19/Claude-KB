@@ -768,3 +768,25 @@ required (real identifiers, quoted user data, encoding fixtures). Audit anything
 outward-facing with a script that flags bytes outside \x00-\x7F before sending it.
 The user stated this as a standing rule ("never use em unless required absolutely"), so it
 applies to every project, not just Odyssey.
+
+### Verify a CF-derived reference against official samples BEFORE building the task (2026-08-18)
+Context: adapting hard Codeforces problems into Odyssey benchmark tasks, where the
+bundle needs a reference solution that drives the verifier to full reward.
+Problem: for CF 1868F (*3500) the natural greedy simulation - repeatedly take the
+max-sum interval and decrement it - looks obviously correct and is not. It returned
+10 vs the official 6, and 1936976 vs 1936973. The statement forces picking A max-sum
+interval but asks for the MINIMUM operation count, so tie-breaking among equal-sum
+intervals is the entire difficulty. Nothing in the statement flags this; only the
+samples do.
+Fix: the official samples are cheap, authoritative ground truth. Write the candidate
+reference FIRST, run it against every provided sample, and discard the problem if it
+disagrees. Do not start building the environment, generators or grader until that
+check passes - a task whose oracle is subtly wrong is worse than no task, because it
+fails the oracle stage or, worse, grades agents against wrong answers.
+Corollary for selection: prefer COUNTING problems ("how many X"), whose brute force is
+unambiguous, over OPTIMIZATION problems ("minimum number of operations"), where the
+optimum over tied choices is usually where the difficulty hides. CF 2245H (count
+connectable pairs) passed the sample check 7/7 first try; 1868F failed immediately.
+Related: I do NOT need the intended *3500 algorithm. Input scale is mine to choose, so
+a reference I can implement reliably (e.g. a lazy max-subarray segment tree) is enough
+if I size the workload so the naive approach misses the budget and mine clears it.
