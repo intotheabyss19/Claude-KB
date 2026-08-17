@@ -753,3 +753,18 @@ session reads how to talk back without being told. Messages as commits, one appe
 per author (single-writer ⇒ pulls never conflict), a `SessionStart` hook to surface unread,
 and a checked-in `setup.sh` for machine config. Note project-settings hooks need each person
 to approve the folder, so the manual path must always work too.
+
+### No em dashes, no decorative non-ASCII, anywhere (2026-08-18)
+Context: filling an external submission form (Odyssey draft) and authoring a task bundle.
+Problem: every long field had been filled with em dashes before the user caught it, and
+the bundle itself carried 19 em dashes across instruction.md, C++ comments, and Python
+scripts, plus non-ASCII math symbols in the markdown. Nothing in the KB warned about this.
+Two costs: non-ASCII leaks into files that get parsed, diffed, or byte-compared, and in
+prose it reads as an AI tell to the human reviewer who decides whether a task is kept.
+Fix: default to plain ASCII punctuation in ALL output - chat, code, comments, commit
+messages, docs, form fields. Write "-" or restructure rather than reaching for an em dash.
+Map the rest to ASCII: <= >= x ^2 * -> <=> => union ... Keep non-ASCII only when genuinely
+required (real identifiers, quoted user data, encoding fixtures). Audit anything
+outward-facing with a script that flags bytes outside \x00-\x7F before sending it.
+The user stated this as a standing rule ("never use em unless required absolutely"), so it
+applies to every project, not just Odyssey.
