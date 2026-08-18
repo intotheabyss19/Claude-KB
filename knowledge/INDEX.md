@@ -20,6 +20,7 @@ file. Always mention to the user that a KB entry was found.
 - model challenge, red team, eval design, benchmark design, adversarial task, make it hard, stump the model, frontier model fail, difficulty design, can't challenge the model → knowledge/model-challenge-design.md
 - llm mastery, become master at LLM, mastery roadmap, prediction log, capability map, calibration, use LLMs to full potential, exponential growth frontier models, guide/break/amplify models → knowledge/llm-mastery-roadmap.md
 - bash script, shell script, write a .sh, rg, ripgrep, grep -r, jq parsing, rg --json, scope a search, exclude vendor/node_modules → knowledge/shell.md
+- heartbeat, unattended, user away, going to sleep, brb, continue autonomously, keep session alive, agent stalled, watchdog, agent died mid-run, checkpoint progress → knowledge/autonomous-operation.md
 
 ## Patterns (cross-domain)
 

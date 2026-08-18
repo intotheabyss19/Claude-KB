@@ -74,6 +74,25 @@ Improve + sync without being asked, never at the cost of curation.
 - **Sync auto:** the `kb-autopush` Stop-hook pushes unpushed `main` via the
   deploy key (push-only).
 
+## 10. Arm a Heartbeat Before Unattended Time
+When the user says they are leaving - asleep, away, busy for hours, "continue
+autonomously", "don't pause for me" - arm a persistent heartbeat BEFORE starting,
+then stop it (TaskStop) when they return. Without one the session stalls the
+moment nothing is running, and the whole absence is wasted: the main loop only
+runs when something wakes it, and background agents only wake you when they
+finish.
+
+    Monitor({persistent: true, timeout_ms: 3600000,
+             description: "heartbeat every 10min",
+             command: 'while true; do echo "heartbeat $(date -u +%H:%MZ) - <standing instruction>"; sleep 600; done'})
+
+The emitted line IS the wake instruction - write what to DO on waking, not the
+word "heartbeat". Never end an unattended turn on a blocking question; at a fork,
+take the reversible option, state the assumption, keep moving.
+*Backstop:* the `heartbeat-guard` UserPromptSubmit hook detects both departure
+and return language and reminds you. The hook is the backstop; this rule is
+primary.
+
 ---
 
 ## KB Contract (retrieve + capture) - the two non-negotiables
