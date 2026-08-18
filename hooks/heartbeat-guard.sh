@@ -15,7 +15,15 @@ command -v jq >/dev/null 2>&1 && prompt="$(printf '%s' "$payload" | jq -r '.prom
 [ -z "$prompt" ] && exit 0
 lc="$(printf '%s' "$prompt" | tr '[:upper:]' '[:lower:]')"
 
-AWAY_RE='goodnight|good night|going to (sleep|bed)|off to (sleep|bed)|heading to (sleep|bed)|i.ll be (away|out|busy|back|gone|afk)|be back in|brb|afk|stepping (out|away)|logging off|signing off|heading out|busy for|for the next [0-9]+ ?(h|hour|hr|min)|overnight|while i.?m (asleep|away|out|gone)|until i get back|continue (working )?(autonomously|on your own|without me)|work autonomously|keep (going|working) (until|while|till)|do not pause|don.t pause|no need to (ask|check with) me|don.t wait for me'
+AWAY_RE='goodnight|good ?night|going to (sleep|bed)|off to (sleep|bed)|heading to (sleep|bed)|going to nap'
+AWAY_RE="$AWAY_RE"'|i.?(ll| will) be (away|out|gone|afk|asleep|offline)|i.?m (heading |going )?(off|away|out) '
+AWAY_RE="$AWAY_RE"'|i.?(ll| will) be back (in|after|by|around|soon|shortly|tomorrow|tonight|later today)|be back in [0-9]'
+AWAY_RE="$AWAY_RE"'|\bbrb\b|\bafk\b|stepping (out|away)|logging off|signing off|heading out for'
+AWAY_RE="$AWAY_RE"'|busy for (the next|a while|a few|[0-9])|for the next [0-9]+ ?(h|hour|hr|min)'
+AWAY_RE="$AWAY_RE"'|while i.?m (asleep|away|out|gone)|until i (get |am |.?m )?back|back in the morning|till morning|until morning'
+AWAY_RE="$AWAY_RE"'|continue (working )?(autonomously|on your own|without me)|work autonomously'
+AWAY_RE="$AWAY_RE"'|keep (going|working) (until|while|till)|do(n.?t| not) pause (for me|and wait|until i)'
+AWAY_RE="$AWAY_RE"'|no need to (ask|check with|wait for) me|don.?t wait (for me|on me)'
 
 BACK_RE='i.?m back|im back|back now|i.?m here now|just got back|awake now'
 
