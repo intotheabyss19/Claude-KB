@@ -9,18 +9,21 @@ before they were understood.
 
 ---
 
-### Keep an unattended session alive with a heartbeat Monitor
+### Keep a heartbeat running while work is in flight
 
-**Context:** the user leaves for hours - asleep, out, "busy for 2-3 hours" - and
-asks you to keep working.
+**Context:** any work that outlives the turn - background agents, long builds,
+probes, monitoring, an autonomous stretch. The user may or may not be present; it
+does not matter.
 
 **Problem:** the main loop only runs when something wakes it. Background agents
 wake you when they finish, but between them nothing does, so the session quietly
 stops and the entire absence is wasted. This is invisible while it happens: there
 is no error, just silence.
 
-**Fix:** arm a persistent Monitor before starting, and stop it with TaskStop when
-they return.
+**Fix:** arm a persistent Monitor before starting, and stop it with TaskStop when the
+WORK finishes - not when the user returns. It tracks work in flight, not attendance.
+A heartbeat stopped early strands whatever is still running; one left armed after the
+work is done is just noise.
 
     Monitor({persistent: true, timeout_ms: 3600000,
              description: "heartbeat every 10min",
@@ -35,7 +38,7 @@ Two habits that make it actually work:
 - Never end an unattended turn on a blocking question; they are not there to
   answer it. At a genuine fork, take the reversible option, state the assumption,
   and keep moving.
-- Stop the heartbeat when they return, or it fires for the rest of the session.
+- Stop it when the work is finished or called off, not when the user reappears.
 
 *Automated by the `heartbeat-guard` UserPromptSubmit hook, which fires on both
 departure and return language. See rule 10 in `docs/working-rules.md`; the hook is
