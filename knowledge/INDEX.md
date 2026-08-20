@@ -16,6 +16,7 @@ file. Always mention to the user that a KB entry was found.
 > *skill*, not this map — INDEX only routes the install/config gotcha below.
 
 - graphify install, graphify setup, CLAUDE_CONFIG_DIR, graphify-out gitignore, "do not graph the KB", graphify update → knowledge/tooling.md
+- artifact link 404, artifact page not found, artifact won't open, publish artifact URL, default browser claude.ai login → knowledge/tooling.md
 - eris, shipd, challenge, public.zip, setup_challenge, dataset/public, submission.csv, benchmark challenge → knowledge/eris.md
 - model challenge, red team, eval design, benchmark design, adversarial task, make it hard, stump the model, frontier model fail, difficulty design, can't challenge the model → knowledge/model-challenge-design.md
 - llm mastery, become master at LLM, mastery roadmap, prediction log, capability map, calibration, use LLMs to full potential, exponential growth frontier models, guide/break/amplify models → knowledge/llm-mastery-roadmap.md

@@ -2,6 +2,28 @@
 
 ## Contents
 - Map large/unfamiliar codebases with graphify
+- Artifact links show "page not found" — auth mismatch, not a broken link
+
+### Artifact links show "page not found" — auth mismatch, not a broken link
+
+**Context:** Claude Code publishes an Artifact; user opens the URL and gets
+"page not found". User concluded artifacts never work.
+
+**Problem:** Artifacts are private to the Claude account that published them,
+and claude.ai renders "page not found" (not "no access") for a logged-out or
+wrong-account viewer. Terminal ctrl/cmd-clicks open the DEFAULT browser — on
+this Mac that is Zen (`app.zen-browser.zen`), which isn't signed into
+claude.ai — while Brave, signed in as the owning account
+(satyaranjanb821@gmail.com), renders the same URL fine. Looks like a dead
+link; it's an auth mismatch in the browser that happened to open it.
+
+**Fix:** Sign into claude.ai with the owning account in the default browser
+(or make the signed-in browser the default / paste the URL there). When
+handing the user an artifact URL, say it opens only in a browser signed into
+the owning Claude account; if they report "not found", check default-browser
+handler (`plutil -p ~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist`,
+look for the https `LSHandlerRoleAll`) and login state before touching the
+artifact itself. Verify rendering with claude-in-chrome when in doubt.
 
 ### Map large/unfamiliar codebases with graphify
 
