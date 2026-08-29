@@ -940,3 +940,13 @@ yields concatenated WAV headers and only the first chunk plays. (2) Auth failure
 sizes. Branch on 403 for auth. Also: thinking mode is ON by default on `sarvam-105b`, so a small `max_tokens`
 returns empty `content` with only `reasoning_content` — pass `reasoning_effort=None` for short replies.
 Docs shortcut: append `.md` to any docs.sarvam.ai URL for clean markdown; `/llms.txt` is the full index.
+
+## 2026-08-29 — Sarvam AI: two more, found only by running the code
+**Context:** Addendum to the Sarvam entry above; surfaced running all six examples against the live API.
+**Problem:** (1) Streaming chat emits a final **usage-only chunk with an empty `choices` list**, so
+`chunk.choices[0].delta` raises `IndexError` at the end of *every* stream — the docs' own streaming snippet has
+this bug. (2) `sarvam-105b` replies routinely **begin with a newline**, which shows up as a blank first line in
+a UI and a pause in TTS.
+**Fix:** `if not chunk.choices: continue` at the top of the stream loop; `.strip()` every `message.content`
+before printing or speaking it. Measured latency for budgeting: Bulbul TTS 0.55–1.0 s warm (~2.5 s first call,
+connection setup), Saaras STT ~2 s for a 4.5 s clip.
