@@ -877,3 +877,66 @@ Trap the fix leaves behind: `/permissions` writes the grant into `permissions.al
 where it is INERT while auto mode is on (the classifier outranks it) and LIVE the
 moment auto mode is off. So it fails exactly when you wanted it and fires exactly when
 you would rather have been asked. Clean these up after a one-off grant.
+
+## 2026-08-28 — Sheru voice-assistant research (session in ~/Projects/Sheru)
+- Picovoice Porcupine free tier ended 2026-06-30; free custom wake word = `sherpa-onnx` open-vocab KWS (zero training) or `livekit-wakeword` (train, 100x fewer false accepts than openWakeWord; openWakeWord models are CC-BY-NC).
+- macOS 26 Tahoe TCC attributes Mic/Accessibility/Screen Recording to the *responsible binary*; bare `python3` under launchd silently gets no prompt (`could not create image from display`). Ship a signed `.app` with stable bundle ID. `pynput` broken on macOS 26 → pyobjc Quartz CGEvent.
+- Claude Code 2.1.x has `/voice` push-to-talk dictation (subscription only, cloud STT, Hindi ok, no wake word). `claude -p` runs on subscription; `--bare` drops OAuth (needs API key). Agent SDK: docs say claude.ai login not permitted → API key only.
+- Anthropic computer-use tool is now `computer_toolset_20260801` (no beta header, Opus 5/Sonnet 5); no macOS executor from Anthropic. macOS-native CUA benchmarks: 20-35% (macOSWorld, MacArena), multi-app ~0%; only ~33% of Mac apps expose a full AX tree (Screen2AX).
+- Claude in Chrome went GA 2026-08-26; Claude Computer Use in Cowork/Desktop since 2026-03 (Pro/Max).
+
+## 2026-08-28 - Chrome extension vs dnd-kit sortable lists (AfterQuery assessment form)
+
+Context: filling AfterQuery "Long Horizon Coding Assessment" via claude-in-chrome.
+- `form_input` on textareas WORKED this time (16 fields, React word counters updated,
+  autosave "Saved") - contrary to the 2026-08-26 dispute-form note where the classifier
+  blocked it. Not deterministic; try form_input first, fall back to click+type.
+- Drag-to-reorder list (dnd-kit style, "press space to pick up, arrows to move"):
+  `left_click_drag` at correct coords did NOT reorder (synthetic drag lacks intermediate
+  pointermoves); keyboard Enter/Space + ArrowUp lifted the item but never committed the
+  drop. 6 attempts. Hand the drag to the user (rule 5) - 5 seconds for them.
+- Screenshot pixel scale alternates between calls (1512x808 vs true viewport 1470x786);
+  normalise to the Viewport line from read_page before using coordinates.
+- `javascript_tool` is blocked on this site ("Cookie/query string data"), even for
+  `document.querySelector('main').innerText`. Use get_page_text/read_page/screenshots.
+
+## AppleScript: `full` (and other scripting-dictionary terms) as a variable name → -10003 "Access not allowed"
+Date: 2026-08-28 · Context: Sheru Contacts lookup silently returned "not in contacts".
+- **Problem:** `tell application "Contacts" ... set full to name of p` fails at runtime with
+  `Can't set full to name of p. Access not allowed. (-10003)`. Reproduced: renaming the var to `theName`/`nm`
+  works; only `full` fails. Cause: `full` collides with Contacts' `full name` property term — AppleScript parses
+  the assignment target as app terminology, not a plain variable.
+- **Fix:** never use a word that appears in the target app's scripting dictionary as a variable name
+  (`full`, `name`, `count`, `text`, `date`, `id`, `count`, etc. are risky). Use distinct names (`theName`).
+- **Second bug it masked:** the Python wrapper treated ANY osascript failure (rc!=0, empty stdout) as
+  "no match" → user got a misleading "couldn't find X in contacts". Distinguish error from empty-result.
+
+## AppleScript Contacts: `whose` query does NOT auto-launch the app → -600 "Application isn't running"
+Date: 2026-08-28 · Context: Sheru "couldn't find <name> in contacts" when Contacts.app was closed.
+- **Problem:** `tell application "Contacts" ... (every person whose name contains "x")` throws
+  `-600 Application isn't running` when Contacts isn't already running — the `whose` filter evaluates before
+  the implicit launch. Silently looked like "contact not found".
+- **Fix:** `subprocess.run(["open","-gj","-a","Contacts"])` (hidden, no focus steal) before querying, add
+  `launch` inside the tell block, and retry ~4× / 0.5s on `-600` (store takes ~1s to be ready post-launch).
+
+---
+## 2026-08-29 — `uv sync` prunes packages that aren't in the lock
+**Context:** Added one dep to Sheru's `pyproject.toml`, ran `uv sync`.
+**Problem:** `uv sync` removed `sherpa-onnx-core` and `flatbuffers` — installed earlier by hand, never
+recorded in `pyproject.toml`/`uv.lock`. `sherpa-onnx` then failed to import: `Library not loaded:
+@rpath/libonnxruntime.dylib` (the native runtime ships in `sherpa-onnx-core`, which `sherpa-onnx` does not
+declare as a dependency). Adding a dep silently broke an unrelated subsystem.
+**Fix:** `uv sync` makes the venv match the lock exactly — it is a prune, not an install. Before running it on
+a project with hand-installed packages, `uv pip list` and diff against the lock. Restore with `uv pip install`
+(no prune), and pin the survivor in `pyproject.toml` so the next sync keeps it.
+
+## 2026-08-29 — Sarvam AI API: two gotchas the docs get wrong or bury
+**Context:** First integration against docs.sarvam.ai (TTS + chat).
+**Problem:** (1) `/text-to-speech` returns `audios` = a list of **complete base64 WAV files**, not PCM chunks.
+The docs' own curl snippet does `''.join(d['audios'])` then base64-decodes — for multi-chunk output that
+yields concatenated WAV headers and only the first chunk plays. (2) Auth failures return **403, not 401**
+(`error.code: invalid_api_key_error`), so `except status == 401` never fires.
+**Fix:** Use the SDK's `sarvamai.play.save()` — it strips subsequent WAV headers and rewrites the RIFF/data
+sizes. Branch on 403 for auth. Also: thinking mode is ON by default on `sarvam-105b`, so a small `max_tokens`
+returns empty `content` with only `reasoning_content` — pass `reasoning_effort=None` for short replies.
+Docs shortcut: append `.md` to any docs.sarvam.ai URL for clean markdown; `/llms.txt` is the full index.
