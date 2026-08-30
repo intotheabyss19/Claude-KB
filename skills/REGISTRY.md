@@ -23,6 +23,7 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 | project | 169 | custom | "save this lesson" / capture a project lesson |
 | review-knowledge-base | 175 | custom | "review the knowledge base" |
 | learn-kb | 199 | custom | `/learn-kb`; a newcomer asks "what is this / how do I use it" |
+| speak | 258 | custom | talk to me / use your voice / read aloud / be my voice teacher; spoken conversation |
 | verify-security | 260 | vendor:agent-verifier | whole-repo secret/dep/injection scan |
 | interview-me | 485 | vendor:agent-skills | underspecified ask; "interview me" |
 | debugging-and-error-recovery | 249 | vendor:agent-skills | systematic root-cause debugging |
@@ -31,7 +32,7 @@ Measured 2026-06-25. Description chars = per-turn cost in EVERY session.
 | test-driven-development | 231 | vendor:agent-skills | tests-first; implementing logic, fixing a bug, changing behavior (broad — fires on most coding tasks) |
 | postgres | 396 | vendor:ai-skills | read-only SQL against PostgreSQL; schema/table exploration |
 
-**Global budget ledger:** 14 active · **3,483 / 8,000 chars** · headroom **4,517**.
+**Global budget ledger:** 15 active · **3,741 / 8,000 chars** · headroom **4,259**.
 Shell `rg`/`jq` reference lives in `knowledge/shell.md` (INDEX-routed, 0 budget),
 not as a skill — reference, not a procedure.
 ¹ `graphify` is installed separately (`~/.claude/skills/graphify`), NOT in this
