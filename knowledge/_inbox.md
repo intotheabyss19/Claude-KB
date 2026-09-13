@@ -950,3 +950,128 @@ a UI and a pause in TTS.
 **Fix:** `if not chunk.choices: continue` at the top of the stream loop; `.strip()` every `message.content`
 before printing or speaking it. Measured latency for budgeting: Bulbul TTS 0.55–1.0 s warm (~2.5 s first call,
 connection setup), Saaras STT ~2 s for a 4.5 s clip.
+
+### CronCreate is session-scoped — not a scheduler for anything durable (2026-08-31)
+**Context:** youtube repo, building daily recurring Claude sessions (research, metrics,
+publish-queue checks) meant to run for months.
+**Problem:** `CronCreate` reads like a scheduler but its jobs live only in the calling
+session's memory: nothing is written to disk, they die when Claude exits, they only fire
+while the REPL is idle, and recurring jobs auto-expire after 7 days. Building a
+months-long operation on it means the schedule silently evaporates.
+**Fix:** for anything that must outlive a session, use the OS scheduler — macOS
+`launchd` (`StartCalendarInterval`) invoking a wrapper script that runs
+`claude -p "<prompt>" --permission-mode bypassPermissions --output-format json`.
+`--output-format json` yields `total_cost_usd` and `num_turns`, so scheduled spend is
+loggable. Keep a copy of each generated plist in the repo so the schedule is in git.
+Reserve `CronCreate` for reminders inside one working session.
+**Also:** an unattended session needs `bypassPermissions` (it cannot answer a prompt and
+will hang until killed), so bound it with a `PreToolUse` hook that reads an env var the
+wrapper exports and denies writes outside a declared directory. Permission mode is not
+containment; a hook is.
+
+### Multi-config-dir machines: shell functions are invisible to launchd/cron (2026-08-31)
+**Context:** same youtube cadence build. Machine has ~/.claude-satya, -ashish, -work,
+-personal, selected by zsh FUNCTIONS (`claudes`, `claudea`, ...) in ~/.zshrc; vanilla
+~/.claude is deliberately reserved.
+**Problem:** anything non-interactive — launchd, cron, a script, a nested `claude -p` —
+never sources ~/.zshrc, so those functions do not exist and a bare `claude` silently
+falls back to `~/.claude`. The scheduled job then runs as the wrong profile (or an
+unauthenticated one) and fails in a way that looks like a Claude problem, not a config
+problem. Aliases have the same hole; only exported env vars survive.
+**Fix:** resolve `CLAUDE_CONFIG_DIR` explicitly and **refuse rather than default** —
+project `.env` first, then the calling session's `CLAUDE_CONFIG_DIR`, then hard error
+listing the dirs found. Pin the resolved value into the launchd plist's
+`EnvironmentVariables` (alongside HOME and PATH) so the schedule cannot drift from the
+profile that installed it. Same trap applies to any wrapper defined as a shell function.
+
+### Recovering an artifact whose local source file was deleted
+Context: scratchpad HTML for a published artifact was wiped by OS /tmp cleanup;
+needed to append a section and republish to the SAME url.
+Problem: `Artifact action:"read"` returns the *served* page, which is wrapped in
+the harness `<!doctype html><head><!-- frame-runtime --><script>...` preamble +
+`</body></html>`. Republishing that file verbatim double-wraps the page.
+Fix: read it back (full HTML lands in a tool-results/*.html file the result
+names), then strip everything up to and including `</head><body>` and the
+trailing `</body></html>` before editing. Byte count of the stripped file should
+match the original publish size — good integrity check.
+Also: reading it back prints the whole preamble into context (~9k tokens). Copy
+the tool-results file with `cp` and strip via python; never `cat`/`head` line 1.
+
+## Claude Code CLI cannot OAuth into MCP servers that whitelist redirect URIs
+**Date:** 2026-09-01 · **Context:** connecting Groww's hosted MCP (`https://mcp.groww.in/mcp`)
+**Problem:** `claude mcp add --transport http ...` registers the server, but authorization
+fails at the provider with "invalid redirect url". The CLI sends
+`http://localhost:<random port>/callback` as the redirect URI. Providers that validate
+redirect_uri against a registered allowlist reject it, because the random port can never be
+pre-registered. Only the port is configurable (`--callback-port`, `oauth.callbackPort`,
+`MCP_OAUTH_CALLBACK_PORT`) -- host and path are hardcoded, so HTTPS-requiring providers are
+unreachable entirely. Open upstream: claude-code #52961 (Notion), #10439, #37747, #42765,
+#66511, #69326. Same servers work in Claude Desktop / claude.ai, which have a stable
+registered callback.
+**Fix:** add the server at claude.ai/settings/connectors instead (paid plan required);
+connectors configured there load automatically in Claude Code on the same account. Do not
+burn attempts guessing a `--callback-port` -- if the provider documents only claude.ai and
+Cursor, no localhost port is whitelisted.
+**Tell:** provider says "invalid redirect url" / "redirect_uri did not match any configured
+URIs" *after* the server registers successfully. Registration succeeding proves nothing.
+
+## 2026-09-05 — Authoring an agentic-coding challenge: mine the fix log, don't read the repo
+
+**Context:** DA agentic-coding projects ask you to author a problem a weak coding agent will fail,
+in a repo you don't know. Reading an 11k-line codebase to find a worthy problem is the wrong move.
+
+**Method (~15 min per candidate):** the maintainer already found the bug, proved it real, proved it
+fixable, and enumerated the edge cases in their test diff. Mine that.
+1. `git log --no-merges` and rank fix commits by: touches source AND tests, 40–400 total lines,
+   recent (past the target model's training data), links an issue.
+2. The commit's PARENT is your base SHA. Feasibility is proven by construction.
+3. `gh issue view N -R owner/repo` — the issue text is a realistic engineer's request, which
+   satisfies the "realistic / representative" guideline for free.
+4. Write the problem statement FROM THE ISSUE, before reading the fix diff. Reading the gold patch
+   first biases you into specifying the implementation, which is what produces overspecified
+   verifiers.
+5. Only then `git show <fix>` — harvest the edge cases from the test diff as candidate requirements.
+6. Confirm the base behaviour empirically in ~10 lines. You now understand ~200 LOC, not the repo.
+
+**Corollaries:** repo selection should optimise for a rich, recent, issue-linked fix history — that
+is what makes this method work at all. Fallbacks when the fix log is thin: surface asymmetry
+(a feature in the library but not the CLI — greppable) and enumerable test-coverage gaps.
+Don't ship upstream's tests as your verifier or paste the issue verbatim.
+
+Related: knowledge/model-challenge-design.md (difficulty levers), memory da-agentic-coding-training.
+
+## 2026-09-13 — DA Rate-and-Review: scope the verification to the form's own checklist
+
+**Context:** R&R tasks ("Rate And Review: Ummon — Create and Evaluate Agentic Coding Tasks")
+hand you another worker's submission: a Harbor task, two agent trajectories, and their
+rubrics/ratings/rationales. On 2026-09-13 we reviewed one in ~4h wall clock against a **3h
+reportable cap**, and the output was "nothing to change."
+
+**The lesson: match effort to the brief, not to what's verifiable.** The instructions scope
+the work to Step 1 (five mechanical deliverable checks) and Step 2 (six rubric properties).
+Nothing asks you to independently re-derive every YES/NO answer or spot-check every cited
+step number. We did, plus a scipy clone and a dictionary sweep of 20 free-text fields. That
+found real things — a false `scipy/signal/__init__.py` claim, 39 typos — none of which
+changed a single score. Next time: read both diffs, find the decisive divergence, sample
+four or five rubrics, walk the Step 1 checklist, stop.
+
+**Cost asymmetry worth knowing before you start:**
+- *Unusable* is fastest — one failed check hides Step 2 and sets both scores to Bad. ~30 min.
+- *Good/clean* is slow, because confirming correctness has no early exit; you only know all
+  13 answers hold after checking all 13. This is the case most likely to blow the cap.
+- *Fixably bad* is slowest — full verification **plus** repair, rezip, reupload, and notes.
+
+**Form mechanics that decide the work:** "Clean — nothing to change" hides the deliverable
+issue checkboxes and notes; "Sound as submitted" hides the rubric ones. The issue checkboxes
+have no option meaning "fixed typos", so cosmetic edits + "I edited…" forces a false defect
+label onto a clean submission. Fix spelling if you like, keep "Sound as submitted", and
+disclose the edits in the always-required Review Comment instead.
+
+**Cheap high-value checks** (minutes, not hours): `task_checksum` identical across trials
+proves same prompt + repo state; sha1 the uploaded patches against `<trial>/artifacts/patch.diff`;
+`metadata.userEventLog` + `numResponsePastes` / `injectedAiAgentElements` in the page props
+show whether rationales were typed or pasted. The built-in `rubric_llm_check` only sees the
+prompt and the rubric statements — never the diffs or trajectories — so its PASSes say
+nothing about answer correctness.
+
+Related: memory da-rate-and-review-scope, da-agentic-coding-training, da-task-page-structure.
